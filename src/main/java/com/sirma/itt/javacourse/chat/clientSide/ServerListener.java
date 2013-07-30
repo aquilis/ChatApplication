@@ -4,9 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
- * Listens for messages from the server and updates the client application's GUI.
+ * Listens for messages from the server and updates the client application's
+ * GUI.
  */
 public class ServerListener extends Thread {
 	private Client.ClientGUI gui = null;
@@ -21,16 +24,20 @@ public class ServerListener extends Thread {
 	 * @param socket
 	 *            is the client socket to the server.
 	 * @param sender
-	 *            is the sender thread that has to be deactivated when the server denies access
+	 *            is the sender thread that has to be deactivated when the
+	 *            server denies access
 	 * @param gui
-	 *            is the client GUI that the listener has to update when new messages arrive
+	 *            is the client GUI that the listener has to update when new
+	 *            messages arrive
 	 */
-	public ServerListener(Socket socket, ServerSender sender, Client.ClientGUI gui) {
+	public ServerListener(Socket socket, ServerSender sender,
+			Client.ClientGUI gui) {
 		this.socket = socket;
 		this.sender = sender;
 		this.gui = gui;
 		try {
-			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			in = new BufferedReader(new InputStreamReader(
+					socket.getInputStream()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -51,6 +58,11 @@ public class ServerListener extends Thread {
 			mustTerminate = true;
 		} else if ("access allowed".equals(cmd)) {
 			gui.moveToMainForm();
+		} else if ("onlineClients".equals(cmd.substring(0, 12))) {
+			String[] allUsers = cmd.substring(13).split("[\\[\\],]+");
+			ArrayList<String> temp = new ArrayList<String>(
+					Arrays.asList(allUsers));
+			gui.log(temp.toString());
 		}
 	}
 

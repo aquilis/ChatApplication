@@ -5,10 +5,8 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -30,10 +28,8 @@ public final class Client {
 
 	private String nickname = "";
 	private Socket clientSocket = null;
-	private final PrintWriter out = null;
 	private final ClientGUI gui;
 	private ServerSender sender = null;
-	private ServerListener listener = null;
 
 	/**
 	 * Runs the client application.
@@ -52,10 +48,8 @@ public final class Client {
 	 *            are the cmd args
 	 * @throws IOException
 	 *             if problem with the IO
-	 * @throws UnknownHostException
-	 *             if host can not be found
 	 */
-	public static void main(String[] args) throws UnknownHostException, IOException {
+	public static void main(String[] args) throws IOException {
 		new Client();
 	}
 
@@ -69,14 +63,15 @@ public final class Client {
 		clientSocket = new Socket(address, port);
 		sender = new ServerSender(clientSocket);
 		sender.sendMessage("cmd " + nickname);
-		listener = new ServerListener(clientSocket, sender, gui);
+		new ServerListener(clientSocket, sender, gui);
 	}
 
 	/**
-	 * Formats the client's message to the server putting it date and nickname.
+	 * Formats the client's output message putting it the current time and
+	 * nickname and capitalizing its first letter.
 	 * 
 	 * @param msg
-	 *            is the pure message from the gui
+	 *            is the pure message from the GUI
 	 * @return the formatted message to be sent to the server
 	 */
 	private String formatMessage(String msg) {

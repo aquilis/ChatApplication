@@ -90,6 +90,10 @@ public class ClientListener extends Thread {
 				client.getSender().sendMessage("cmd access allowed");
 				client.setNickname(cmd);
 				transmitter.sendMessage(cmd + " connected");
+				// send to all clients the new list of connected users packed in
+				// a string
+				transmitter.sendMessage("cmd onlineClients "
+						+ transmitter.getListClients());
 			} else {
 				// nickname not valid. Send the client command that it is not accepted and
 				// disconnect him
