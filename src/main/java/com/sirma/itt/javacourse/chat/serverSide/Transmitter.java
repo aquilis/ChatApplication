@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import com.sirma.itt.javacourse.chat.serverSide.serverCommands.ServerCommand;
+
 /**
  * A mediator class that has methods for sending the certain message to all connected clients to the
  * server. Maintains a list of enqueued messages to be sent, and a list of all connected clients
@@ -12,7 +14,7 @@ import java.util.Queue;
  */
 public class Transmitter extends Thread {
 	private final List<ClientWrapper> listClients = new ArrayList<ClientWrapper>();
-	private final Queue<String> queueMessages = new LinkedList<String>();
+	private final Queue<ServerCommand> queueCommands = new LinkedList<ServerCommand>();
 
 	/**
 	 * Adds a new client to the transmitter's list of clients.
@@ -35,7 +37,7 @@ public class Transmitter extends Thread {
 
 	/**
 	 * Removes the given client from the transmitter's list. The client will no
-	 * longer receive messages.
+	 * longer receive commands.
 	 * 
 	 * @param client
 	 *            is the client to remove
@@ -45,50 +47,50 @@ public class Transmitter extends Thread {
 	}
 
 	/**
-	 * Enqueue the given message to be later sent to all connencted clients.
+	 * Enqueue the given command to be later sent to all connected clients.
 	 * 
-	 * @param msg
-	 *            is the message to be sent to all
+	 * @param cmd
+	 *            is the command to be sent to all connected clients
 	 */
-	public synchronized void sendMessage(String msg) {
-		queueMessages.offer(msg);
+	public synchronized void sendCommand(ServerCommand cmd) {
+		queueCommands.offer(cmd);
 		notify();
 	}
 
 	/**
-	 * If there are enqueued messages in the queue, retrieve and remove the first one, otherwise,
-	 * pause the thread until the queue fills.
+	 * If there are enqueued commands in the queue, retrieve and remove the
+	 * first one, otherwise, pause the thread until the queue fills.
 	 * 
-	 * @return the oldest message in the queue, if any
+	 * @return the oldest command in the queue, if any
 	 */
-	private synchronized String getMessageFromQueue() {
-		while (queueMessages.size() == 0) {
+	private synchronized ServerCommand getCommandFromQueue() {
+		while (queueCommands.size() == 0) {
 			try {
 				wait();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
-		return queueMessages.poll();
+		return queueCommands.poll();
 	}
 
 	/**
-	 * Sends the message to all connected clients.
+	 * Sends the command to all connected clients.
 	 * 
-	 * @param msg
-	 *            is the message to send
+	 * @param cmd
+	 *            is the command to send to all clients
 	 */
-	private void sendToAll(String msg) {
+	private void sendToAll(ServerCommand cmd) {
 		for (ClientWrapper client : listClients) {
-			client.getSender().sendMessage(msg);
+			client.getSender().sendCommand(cmd);
 		}
 	}
 
 	@Override
 	public void run() {
 		while (true) {
-			String message = getMessageFromQueue();
-			sendToAll(message);
+			ServerCommand cmd = getCommandFromQueue();
+			sendToAll(cmd);
 		}
 	}
 }

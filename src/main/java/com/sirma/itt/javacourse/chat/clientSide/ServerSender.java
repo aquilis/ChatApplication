@@ -1,19 +1,21 @@
 package com.sirma.itt.javacourse.chat.clientSide;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import com.sirma.itt.javacourse.chat.clientSide.clientCommands.ClientCommand;
+
 /**
- * A sender thread that sends the client messages to the server.
+ * A sender thread that sends the client commands to the server.
  */
 public class ServerSender extends Thread {
-	private final Queue<String> queueMessages = new LinkedList<String>();
+	private final Queue<ClientCommand> queueCommands = new LinkedList<ClientCommand>();
 	private Socket socket = null;
-	private PrintWriter out = null;
-	private boolean isActive = true;
+	private ObjectOutputStream out = null;
+	private final boolean isActive = true;
 
 	/**
 	 * Deactivates and terminates the sender thread. Used when the client
@@ -32,7 +34,7 @@ public class ServerSender extends Thread {
 	public ServerSender(Socket socket) {
 		this.socket = socket;
 		try {
-			out = new PrintWriter(socket.getOutputStream(), true);
+			out = new ObjectOutputStream(socket.getOutputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -42,11 +44,11 @@ public class ServerSender extends Thread {
 	/**
 	 * Enqueues the message into the queue of messages to be sent.
 	 * 
-	 * @param msg
-	 *            is the message to send
+	 * @param cmd
+	 *            is the command to be sent to the server
 	 */
-	public synchronized void sendMessage(String msg) {
-		queueMessages.offer(msg);
+	public synchronized void sendCommand(ClientCommand cmd) {
+		queueCommands.offer(cmd);
 		notify();
 	}
 
@@ -56,26 +58,29 @@ public class ServerSender extends Thread {
 	 * 
 	 * @return the oldest message in the queue, if any
 	 */
-	private synchronized String getMessageFromQueue() {
-		while (queueMessages.size() == 0) {
+	private synchronized ClientCommand getCommandFromQueue() {
+		while (queueCommands.size() == 0) {
 			try {
 				wait();
 			} catch (InterruptedException e) {
 				return null;
 			}
 		}
-		return queueMessages.poll();
+		return queueCommands.poll();
 	}
 
 	@Override
 	public void run() {
 		while (isActive && (socket != null)) {
-			String message = getMessageFromQueue();
-			if (message == null) {
+			ClientCommand cmd = getCommandFromQueue();
+			if (cmd == null) {
 				break;
 			}
-			out.println(message);
-			out.flush();
+			try {
+				out.writeObject(cmd);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }

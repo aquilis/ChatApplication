@@ -19,6 +19,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import com.sirma.itt.javacourse.chat.clientSide.clientCommands.DisconnectCommand;
+import com.sirma.itt.javacourse.chat.clientSide.clientCommands.JoinRequestCommand;
+import com.sirma.itt.javacourse.chat.clientSide.clientCommands.OutputMessageCommand;
+
 /**
  * The main client application started on the client side.
  */
@@ -62,8 +66,8 @@ public final class Client {
 	private void runClient() throws IOException {
 		clientSocket = new Socket(address, port);
 		sender = new ServerSender(clientSocket);
-		sender.sendMessage("cmd " + nickname);
 		new ServerListener(clientSocket, sender, gui);
+		sender.sendCommand(new JoinRequestCommand(nickname));
 	}
 
 	/**
@@ -206,7 +210,8 @@ public final class Client {
 			sendButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					sender.sendMessage(formatMessage(textBox.getText().trim()));
+					sender.sendCommand(new OutputMessageCommand(
+							formatMessage(textBox.getText().trim())));
 					textBox.setText("");
 				}
 			});
@@ -222,7 +227,7 @@ public final class Client {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					log("You left the chat room");
-					sender.sendMessage("cmd disconnect");
+					sender.sendCommand(new DisconnectCommand());
 					sendButton.setEnabled(false);
 					disconnectButton.setEnabled(false);
 					textBox.setEnabled(false);

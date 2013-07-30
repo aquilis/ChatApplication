@@ -1,11 +1,10 @@
 package com.sirma.itt.javacourse.chat.clientSide;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
+
+import com.sirma.itt.javacourse.chat.serverSide.serverCommands.ServerCommand;
 
 /**
  * Listens for messages from the server and updates the client application's
@@ -13,7 +12,7 @@ import java.util.Arrays;
  */
 public class ServerListener extends Thread {
 	private Client.ClientGUI gui = null;
-	private BufferedReader in = null;
+	private ObjectInputStream in = null;
 	private Socket socket = null;
 	private ServerSender sender = null;
 	private boolean mustTerminate = false;
@@ -36,8 +35,7 @@ public class ServerListener extends Thread {
 		this.sender = sender;
 		this.gui = gui;
 		try {
-			in = new BufferedReader(new InputStreamReader(
-					socket.getInputStream()));
+			in = new ObjectInputStream(socket.getInputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -45,40 +43,34 @@ public class ServerListener extends Thread {
 	}
 
 	/**
-	 * Parses the commands coming from the server.
+	 * Gets the client GUI. Used by the server commands that have to update the
+	 * interface.
 	 * 
-	 * @param cmd
-	 *            is the command to parse and execute
+	 * @return the client GUI.
 	 */
-	private void parseCommand(String cmd) {
-		if ("access denied".equals(cmd)) {
-			gui.showError(
-					"Please, make sure that your nickname is unique and doesn't have invalid characters",
-					"Invalid nickname");
-			mustTerminate = true;
-		} else if ("access allowed".equals(cmd)) {
-			gui.moveToMainForm();
-		} else if ("onlineClients".equals(cmd.substring(0, 12))) {
-			String[] allUsers = cmd.substring(13).split("[\\[\\],]+");
-			ArrayList<String> temp = new ArrayList<String>(
-					Arrays.asList(allUsers));
-			gui.log(temp.toString());
-		}
+	public Client.ClientGUI getGui() {
+		return gui;
 	}
+
+	/**
+	 * sets the mustTerminate variable if the listener has to be stopped from
+	 * outside.
+	 * 
+	 * @param mustTerminate
+	 *            is the variable that stops the thread
+	 */
+	public void setMustTerminate(boolean mustTerminate) {
+		this.mustTerminate = mustTerminate;
+	}
+
 
 	@Override
 	public void run() {
-		String input = "";
+		Object input = null;
 		try {
-			while ((input = in.readLine()) != null) {
-				if ("cmd".equals(input.substring(0, 3))) {
-					parseCommand(input.substring(4));
-					if (mustTerminate) {
-						break;
-					}
-					continue;
-				}
-				gui.log(input);
+			while ((input = in.readObject()) != null) {
+				ServerCommand incomingCommand = (ServerCommand) input;
+				incomingCommand.execute(this);
 			}
 		} catch (IOException e) {
 			sender.deactivate();
@@ -91,6 +83,8 @@ public class ServerListener extends Thread {
 				}
 			} catch (IOException e1) {
 			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
 	}
 }
