@@ -13,9 +13,8 @@ import com.sirma.itt.javacourse.chat.clientSide.clientCommands.ClientCommand;
  */
 public class ServerSender extends Thread {
 	private final Queue<ClientCommand> queueCommands = new LinkedList<ClientCommand>();
-	private Socket socket = null;
 	private ObjectOutputStream out = null;
-	private final boolean isActive = true;
+	private Socket socket = null;
 
 	/**
 	 * Deactivates and terminates the sender thread. Used when the client
@@ -71,7 +70,7 @@ public class ServerSender extends Thread {
 
 	@Override
 	public void run() {
-		while (isActive && (socket != null)) {
+		while (true) {
 			ClientCommand cmd = getCommandFromQueue();
 			if (cmd == null) {
 				break;
@@ -79,8 +78,19 @@ public class ServerSender extends Thread {
 			try {
 				out.writeObject(cmd);
 			} catch (IOException e) {
-				e.printStackTrace();
+				break;
 			}
+		}
+		// when the sender terminates, sends a null object to stop the
+		// corresponding listener on the server side (if the socket is still
+		// open)
+		try {
+			if ((out != null) && (socket != null)) {
+				out.writeObject(null);
+				// clean up
+				out.close();
+			}
+		} catch (IOException e) {
 		}
 	}
 }

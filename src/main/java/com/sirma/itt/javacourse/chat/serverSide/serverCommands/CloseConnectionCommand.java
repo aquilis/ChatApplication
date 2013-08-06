@@ -3,9 +3,9 @@ package com.sirma.itt.javacourse.chat.serverSide.serverCommands;
 import com.sirma.itt.javacourse.chat.clientSide.ServerListener;
 
 /**
- * Sent from the server when the client nickname is valid and unique.
+ * Notifies the client that the server closed the connection.
  */
-public class AccessAllowedCommand implements ServerCommand {
+public class CloseConnectionCommand implements ServerCommand {
 	/**
 	 * Comment for serialVersionUID.
 	 */
@@ -13,6 +13,7 @@ public class AccessAllowedCommand implements ServerCommand {
 
 	@Override
 	public void execute(ServerListener listener) {
-		listener.getClientController().moveToMainForm();
+		listener.getClientController().log("Server closed the connection");
+		listener.getClientController().deactivate();
 	}
 }

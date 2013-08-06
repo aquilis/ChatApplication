@@ -1,19 +1,16 @@
 package com.sirma.itt.javacourse.chat.serverSide.serverCommands;
 
-import com.sirma.itt.javacourse.chat.clientSide.Client;
 import com.sirma.itt.javacourse.chat.clientSide.ServerListener;
 
 /**
- * Encapsulates an incoming message from another client, that has to be
- * displayed onto the GUI of the client module.
+ * Encapsulates a message that has to be sent to a client and displayed on its GUI.
  */
-public class IncomingMessageCommand implements ServerCommand {
+public class MessageToClientCommand implements ServerCommand {
 	/**
 	 * Comment for serialVersionUID.
 	 */
 	private static final long serialVersionUID = 1L;
 	private String message = null;
-	private Client.ClientGUI gui = null;
 
 	/**
 	 * Constructs the commands with a message to be displayed on the client's
@@ -22,13 +19,12 @@ public class IncomingMessageCommand implements ServerCommand {
 	 * @param message
 	 *            is the incoming message.
 	 */
-	public IncomingMessageCommand(String message) {
+	public MessageToClientCommand(String message) {
 		this.message = message;
 	}
 
 	@Override
 	public void execute(ServerListener listener) {
-		this.gui = listener.getGui();
-		gui.log(message);
+		listener.getClientController().log(message);
 	}
 }

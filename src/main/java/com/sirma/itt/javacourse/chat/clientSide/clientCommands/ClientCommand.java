@@ -7,7 +7,7 @@ import com.sirma.itt.javacourse.chat.serverSide.ClientListener;
 /**
  * A client commands is a command sent by the client, executed by the client
  * listener located on the server-side. This interface represents an abstract
- * commands for all other client commands. Every client-server interaction is
+ * command for all other client commands. Every client-server interaction is
  * encapsulated inside a Command class.
  */
 public interface ClientCommand extends Serializable {

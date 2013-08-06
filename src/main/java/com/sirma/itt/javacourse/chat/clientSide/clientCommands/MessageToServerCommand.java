@@ -2,13 +2,13 @@ package com.sirma.itt.javacourse.chat.clientSide.clientCommands;
 
 import com.sirma.itt.javacourse.chat.serverSide.ClientListener;
 import com.sirma.itt.javacourse.chat.serverSide.Transmitter;
-import com.sirma.itt.javacourse.chat.serverSide.serverCommands.IncomingMessageCommand;
+import com.sirma.itt.javacourse.chat.serverSide.serverCommands.MessageToClientCommand;
 
 /**
- * This command sends the client message to all other clients using the
- * transmitter class.
+ * Encapsulates a message that has to be sent to the server and then transmitted to all other
+ * clients.
  */
-public class OutputMessageCommand implements ClientCommand {
+public class MessageToServerCommand implements ClientCommand {
 	/**
 	 * Comment for serialVersionUID.
 	 */
@@ -22,13 +22,13 @@ public class OutputMessageCommand implements ClientCommand {
 	 * @param message
 	 *            is the client message
 	 */
-	public OutputMessageCommand(String message) {
+	public MessageToServerCommand(String message) {
 		this.message = message;
 	}
 
 	@Override
 	public void execute(ClientListener listener) {
 		this.transmitter = listener.getTransmitter();
-		transmitter.sendCommand(new IncomingMessageCommand(message));
+		transmitter.sendCommand(new MessageToClientCommand(message));
 	}
 }

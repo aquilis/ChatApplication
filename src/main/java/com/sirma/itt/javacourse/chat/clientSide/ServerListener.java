@@ -7,15 +7,13 @@ import java.net.Socket;
 import com.sirma.itt.javacourse.chat.serverSide.serverCommands.ServerCommand;
 
 /**
- * Listens for messages from the server and updates the client application's
- * GUI.
+ * That thread listens for messages from the server and forwards them to the
+ * client controller class to handle them.
  */
 public class ServerListener extends Thread {
-	private Client.ClientGUI gui = null;
 	private ObjectInputStream in = null;
-	private Socket socket = null;
 	private ServerSender sender = null;
-	private boolean mustTerminate = false;
+	private ClientController controller = null;
 
 	/**
 	 * Constructs the client listener thread.
@@ -25,15 +23,14 @@ public class ServerListener extends Thread {
 	 * @param sender
 	 *            is the sender thread that has to be deactivated when the
 	 *            server denies access
-	 * @param gui
-	 *            is the client GUI that the listener has to update when new
-	 *            messages arrive
+	 * @param controller
+	 *            the commands need the client controller object in order to
+	 *            command the client's back-end logic and the GUI indirectly
 	 */
 	public ServerListener(Socket socket, ServerSender sender,
-			Client.ClientGUI gui) {
-		this.socket = socket;
+			ClientController controller) {
 		this.sender = sender;
-		this.gui = gui;
+		this.controller = controller;
 		try {
 			in = new ObjectInputStream(socket.getInputStream());
 		} catch (IOException e) {
@@ -43,26 +40,23 @@ public class ServerListener extends Thread {
 	}
 
 	/**
-	 * Gets the client GUI. Used by the server commands that have to update the
-	 * interface.
+	 * Returns the client controller of this listener.
 	 * 
-	 * @return the client GUI.
+	 * @return the client controller of this listener used by the command
+	 *         classes
 	 */
-	public Client.ClientGUI getGui() {
-		return gui;
+	public ClientController getClientController() {
+		return controller;
 	}
 
 	/**
-	 * sets the mustTerminate variable if the listener has to be stopped from
-	 * outside.
+	 * Gets the corresponding sender thread of this listener.
 	 * 
-	 * @param mustTerminate
-	 *            is the variable that stops the thread
+	 * @return the corresponding sender thread of this listener
 	 */
-	public void setMustTerminate(boolean mustTerminate) {
-		this.mustTerminate = mustTerminate;
+	public ServerSender getSender() {
+		return sender;
 	}
-
 
 	@Override
 	public void run() {
@@ -73,18 +67,19 @@ public class ServerListener extends Thread {
 				incomingCommand.execute(this);
 			}
 		} catch (IOException e) {
-			sender.deactivate();
-			try {
-				if (socket != null) {
-					socket.close();
-				}
-				if (in != null) {
-					in.close();
-				}
-			} catch (IOException e1) {
-			}
+			// block entered when the connection to server unexpectedly drops.
+			controller.log("Connection to server lost");
+			controller.deactivate();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
+		} catch (NullPointerException e) {
+		} finally {
+			// clean up
+			try {
+				in.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }

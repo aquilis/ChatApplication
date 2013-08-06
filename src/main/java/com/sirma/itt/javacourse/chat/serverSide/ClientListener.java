@@ -5,7 +5,8 @@ import java.io.ObjectInputStream;
 import java.net.Socket;
 
 import com.sirma.itt.javacourse.chat.clientSide.clientCommands.ClientCommand;
-import com.sirma.itt.javacourse.chat.serverSide.serverCommands.IncomingMessageCommand;
+import com.sirma.itt.javacourse.chat.serverSide.serverCommands.MessageToClientCommand;
+import com.sirma.itt.javacourse.chat.serverSide.serverCommands.RemoveOnlineClientCommand;
 
 /**
  * A handler class for each client. Waits for messages and commands from the
@@ -16,6 +17,16 @@ public class ClientListener extends Thread {
 	private Transmitter transmitter = null;
 	private ObjectInputStream in = null;
 	private ClientWrapper client = null;
+	private ServerController controller = null;
+
+	/**
+	 * Gets the server application's GUI.
+	 * 
+	 * @return the server GUI.
+	 */
+	public ServerController getController() {
+		return controller;
+	}
 
 	/**
 	 * Gets the transmitter of the current client listener. used by the command
@@ -46,8 +57,12 @@ public class ClientListener extends Thread {
 	 *            be sent
 	 * @param client
 	 *            is the client object where the listener is assigned
+	 * @param controller
+	 *            is the server controller that will interact with the GUI
 	 */
-	public ClientListener(Transmitter transmitter, ClientWrapper client) {
+	public ClientListener(Transmitter transmitter, ClientWrapper client,
+			ServerController controller) {
+		this.controller = controller;
 		this.transmitter = transmitter;
 		this.client = client;
 		Socket socket = client.getSocket();
@@ -67,13 +82,29 @@ public class ClientListener extends Thread {
 				incomingCommand.execute(this);
 			}
 		} catch (IOException e) {
-			transmitter.sendCommand(new IncomingMessageCommand(client
-					.getNickname() + " disconnected"));
+			// block entered when the client unexpectedly disconnects without
+			// sending the appropriate command.
+			client.getSender().deactivate();
+			if (!"".equals(client.getNickname())) {
+				controller.log("Connection with " + client.getNickname()
+						+ " lost");
+				transmitter.sendCommand(new MessageToClientCommand(client
+						.getNickname() + " disconnected"));
+				controller
+						.log("Disconnect notifying message sent to all clients ");
+				transmitter.removeClient(client);
+				transmitter.sendCommand(new RemoveOnlineClientCommand(client
+						.getNickname()));
+			}
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} finally {
-			client.getSender().deactivate();
-			transmitter.removeClient(client);
+			// clean up
+			try {
+				in.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }

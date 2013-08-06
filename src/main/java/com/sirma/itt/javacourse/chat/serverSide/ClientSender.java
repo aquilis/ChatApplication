@@ -9,22 +9,19 @@ import java.util.Queue;
 import com.sirma.itt.javacourse.chat.serverSide.serverCommands.ServerCommand;
 
 /**
- * A separate thread that deals with sending commands to its parent client
- * wrapper instance.
+ * A sender thread for each client that sends its commands to the server.
  */
 public class ClientSender extends Thread {
 	private final Queue<ServerCommand> queueCommands = new LinkedList<ServerCommand>();
 	private Socket socket = null;
 	private ObjectOutputStream out = null;
-	private boolean isActive = true;
 
 	/**
 	 * Deactivates and terminates the sender thread. Used when the client
 	 * disconnects or when the connection is lost.
 	 */
 	public synchronized void deactivate() {
-		isActive = false;
-		notify();
+		interrupt();
 	}
 
 	/**
@@ -54,8 +51,8 @@ public class ClientSender extends Thread {
 	}
 
 	/**
-	 * If there are enqueued messages in the queue, retrieve and remove the first one, otherwise,
-	 * pause the thread until the queue fills.
+	 * If there are enqueued messages in the queue, retrieve and remove the
+	 * first one, otherwise, pause the thread until the queue fills.
 	 * 
 	 * @return the oldest message in the queue, if any
 	 */
@@ -64,7 +61,7 @@ public class ClientSender extends Thread {
 			try {
 				wait();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				return null;
 			}
 		}
 		return queueCommands.poll();
@@ -72,13 +69,26 @@ public class ClientSender extends Thread {
 
 	@Override
 	public void run() {
-		while (isActive) {
+		while (true) {
 			ServerCommand cmd = getCommandFromQueue();
+			if (cmd == null) {
+				break;
+			}
 			try {
 				out.writeObject(cmd);
 			} catch (IOException e) {
-				e.printStackTrace();
+				break;
 			}
+		}
+		// if the client listener is still not terminated, send it a null object
+		// to stop it
+		try {
+			if ((out != null) && (socket != null)) {
+				out.writeObject(null);
+				// clean up
+				out.close();
+			}
+		} catch (IOException e) {
 		}
 	}
 }

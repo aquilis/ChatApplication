@@ -2,18 +2,17 @@ package com.sirma.itt.javacourse.chat.serverSide;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
 import com.sirma.itt.javacourse.chat.serverSide.serverCommands.ServerCommand;
 
 /**
- * A mediator class that has methods for sending the certain message to all connected clients to the
- * server. Maintains a list of enqueued messages to be sent, and a list of all connected clients
- * updated regularly.
+ * A mediator class that has methods for sending the certain command to all
+ * connected clients to the server. Maintains a list of enqueued messages to be
+ * sent, and a list of all connected clients updated regularly.
  */
 public class Transmitter extends Thread {
-	private final List<ClientWrapper> listClients = new ArrayList<ClientWrapper>();
+	private final ArrayList<ClientWrapper> listClients = new ArrayList<ClientWrapper>();
 	private final Queue<ServerCommand> queueCommands = new LinkedList<ServerCommand>();
 
 	/**
@@ -31,7 +30,7 @@ public class Transmitter extends Thread {
 	 * 
 	 * @return the list of clients of the transmitter
 	 */
-	public List<ClientWrapper> getListClients() {
+	public ArrayList<ClientWrapper> getListClients() {
 		return listClients;
 	}
 
@@ -84,6 +83,21 @@ public class Transmitter extends Thread {
 		for (ClientWrapper client : listClients) {
 			client.getSender().sendCommand(cmd);
 		}
+	}
+	
+	/**
+	 * Returns a list with just the nicknames of all currently connected clients. Preferred over
+	 * serializing the whole list of ClientWrapper classes and sending it to the clients to be then
+	 * unpacked again.
+	 * 
+	 * @return a list with just the nicknames of the clients
+	 */
+	public ArrayList<String> getAllClientNicknames() {
+		ArrayList<String> stringList = new ArrayList<String>();
+		for (ClientWrapper client : listClients) {
+			stringList.add(client.getNickname());
+		}
+		return stringList;
 	}
 
 	@Override

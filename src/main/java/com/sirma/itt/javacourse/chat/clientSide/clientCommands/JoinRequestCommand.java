@@ -6,12 +6,12 @@ import com.sirma.itt.javacourse.chat.serverSide.Server;
 import com.sirma.itt.javacourse.chat.serverSide.Transmitter;
 import com.sirma.itt.javacourse.chat.serverSide.serverCommands.AccessAllowedCommand;
 import com.sirma.itt.javacourse.chat.serverSide.serverCommands.AccessDeniedCommand;
-import com.sirma.itt.javacourse.chat.serverSide.serverCommands.IncomingMessageCommand;
-
+import com.sirma.itt.javacourse.chat.serverSide.serverCommands.AddOnlineClientCommand;
+import com.sirma.itt.javacourse.chat.serverSide.serverCommands.MessageToClientCommand;
+import com.sirma.itt.javacourse.chat.serverSide.serverCommands.SendOnlineClientsCommand;
 
 /**
- * Sent from the client to the server to request join to the chat room. Contains
- * the client's nickname.
+ * Sent from the client to the server to request join to the chat room.
  */
 public class JoinRequestCommand implements ClientCommand {
 	/**
@@ -73,21 +73,41 @@ public class JoinRequestCommand implements ClientCommand {
 	public void execute(ClientListener listener) {
 		this.transmitter = listener.getTransmitter();
 		this.client = listener.getClient();
+		// if the requested nickname gets approved
 		if (isNicknameValid(nickname) && (isNicknameUnique(nickname))) {
+			// update server's GUI
+			listener.getController().log(nickname + " joined");
+			// send the client access allowed command
 			client.getSender().sendCommand(new AccessAllowedCommand());
 			client.setNickname(nickname);
-			transmitter.sendCommand(new IncomingMessageCommand(nickname
+			// send all other clients the commands to add the new one to their
+			// lists
+			transmitter.sendCommand(new AddOnlineClientCommand(client
+					.getNickname()));
+			transmitter.addClient(client);
+			listener.getController().log(
+					nickname + " was added to the list of online clients");
+			transmitter.sendCommand(new MessageToClientCommand(nickname
 					+ " connected"));
+			listener.getController().log(
+					"Notifying message for a new client sent to all clients");
+			// send the new client the list of all online clients
+			client.getSender().sendCommand(
+					new SendOnlineClientsCommand(transmitter
+							.getAllClientNicknames()));
+			// send the new client a welcome message
+			client.getSender().sendCommand(
+					new MessageToClientCommand("Welcome to chat room!"));
 
-			// TODO Create a command UpdatedListCommand
-			// and send it to all clients using the transmitter
 		} else {
-			// nickname not valid. Send the client command that it is not
-			// accepted and
-			// disconnect him
 			client.getSender().sendCommand(new AccessDeniedCommand());
+			try {
+				// wait for 1 second before terminating the client sender thread
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			client.getSender().deactivate();
-			transmitter.removeClient(client);
 		}
 	}
 }
