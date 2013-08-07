@@ -70,6 +70,8 @@ public class ServerListener extends Thread {
 			// block entered when the connection to server unexpectedly drops.
 			controller.log("Connection to server lost");
 			controller.deactivate();
+			// the sender thread is not needed anymore
+			// sender.deactivate();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (NullPointerException e) {

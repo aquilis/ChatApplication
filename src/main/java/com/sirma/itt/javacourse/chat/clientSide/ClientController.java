@@ -21,6 +21,8 @@ public class ClientController {
 	private Client client = null;
 	// all online users that will be shown in the GUI
 	private ArrayList<String> onlineClients = new ArrayList<String>();
+	// reference used inside the action listeners
+	private final ClientController thisController = this;
 
 	/**
 	 * Constructs the controller with a view and model classes.
@@ -49,7 +51,7 @@ public class ClientController {
 				if (client.isNicknameLengthValid(gui.getNicknameTextBox()
 						.getText().trim())) {
 					try {
-						client.join();
+						client.join(thisController);
 					} catch (IOException e1) {
 						showError("Unable to find server", "Connection error");
 					}

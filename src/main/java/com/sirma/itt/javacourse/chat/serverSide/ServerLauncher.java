@@ -17,8 +17,7 @@ public final class ServerLauncher {
 	 */
 	public static void main(String[] args) {
 		ServerGUI gui = new ServerGUI();
-		ServerController controller = new ServerController(gui, null);
-		Server server = new Server(controller);
-		controller.setServer(server);
+		Server server = new Server();
+		new ServerController(gui, server);
 	}
 }

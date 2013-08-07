@@ -101,12 +101,12 @@ public class JoinRequestCommand implements ClientCommand {
 
 		} else {
 			client.getSender().sendCommand(new AccessDeniedCommand());
-			try {
-				// wait for 1 second before terminating the client sender thread
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			// try {
+			// // wait for 1 second before terminating the client sender thread
+			// Thread.sleep(1000);
+			// } catch (InterruptedException e) {
+			// e.printStackTrace();
+			// }
 			client.getSender().deactivate();
 		}
 	}

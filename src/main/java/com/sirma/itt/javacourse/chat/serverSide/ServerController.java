@@ -2,6 +2,7 @@ package com.sirma.itt.javacourse.chat.serverSide;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 /**
  * The controller class that implements the MVC architecture. Mediates all
@@ -28,28 +29,39 @@ public class ServerController {
 		this.gui = gui;
 		this.server = server;
 		attachButtonsActionListeners();
+		handleClients();
 	}
 
 	/**
-	 * Sets a server model object for this controller, if it can't be passed in
-	 * the object's creation.
-	 * 
-	 * @param server
-	 *            is the back-end server class
+	 * Using the server class functionality, handles the newly connecting
+	 * clients attaching them listener and sender threads.
 	 */
-	public void setServer(Server server) {
-		this.server = server;
+	private void handleClients() {
+		while (true) {
+			try {
+				ClientWrapper lastClient = server.waitForClient();
+				server.attachClientSender(lastClient);
+				server.attachClientListener(lastClient,
+						server.getTransmitter(), this);
+			} catch (IOException e) {
+				break;
+			}
+		}
 	}
 
 	/**
 	 * Attach action listeners to the GUI buttons.
 	 */
-	private void attachButtonsActionListeners(){
+	private void attachButtonsActionListeners() {
 		ActionListener stopButtonListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				log("Connection stopped from server");
 				gui.deactivate();
+				if (server == null) {
+					System.out.println("Server is null");
+					return;
+				}
 				server.stopServer();
 			}
 		};

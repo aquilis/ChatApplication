@@ -18,17 +18,6 @@ public final class Client {
 	private String nickname = null;
 	private Socket clientSocket = null;
 	private ServerSender sender = null;
-	private ClientController controller = null;
-
-	/**
-	 * Sets a client controller for this client.
-	 * 
-	 * @param controller
-	 *            is the client controller to set
-	 */
-	public void setController(ClientController controller) {
-		this.controller = controller;
-	}
 
 	/**
 	 * Using the sender thread, sends the given command to the server.
@@ -101,10 +90,13 @@ public final class Client {
 	 * Opens the connection to the server and starts the sender and listener
 	 * threads.
 	 * 
+	 * @param controller
+	 *            is the client controller. Needed for the listener thread where
+	 *            all received commands from the server will be executed
 	 * @throws IOException
 	 *             if a socket to the server can't be opened
 	 */
-	public void join() throws IOException {
+	public void join(ClientController controller) throws IOException {
 		clientSocket = new Socket(address, port);
 		sender = new ServerSender(clientSocket);
 		new ServerListener(clientSocket, sender, controller);
