@@ -14,6 +14,7 @@ public class ServerListener extends Thread {
 	private ObjectInputStream in = null;
 	private ServerSender sender = null;
 	private ClientController controller = null;
+	private Socket socket = null;
 
 	/**
 	 * Constructs the client listener thread.
@@ -29,6 +30,7 @@ public class ServerListener extends Thread {
 	 */
 	public ServerListener(Socket socket, ServerSender sender,
 			ClientController controller) {
+		this.socket = socket;
 		this.sender = sender;
 		this.controller = controller;
 		try {
@@ -37,6 +39,15 @@ public class ServerListener extends Thread {
 			e.printStackTrace();
 		}
 		start();
+	}
+
+	/**
+	 * Gets the client socket.
+	 * 
+	 * @return the client socket
+	 */
+	public Socket getSocket() {
+		return socket;
 	}
 
 	/**
@@ -71,7 +82,7 @@ public class ServerListener extends Thread {
 			controller.log("Connection to server lost");
 			controller.deactivate();
 			// the sender thread is not needed anymore
-			// sender.deactivate();
+			sender.deactivate();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (NullPointerException e) {

@@ -2,9 +2,6 @@ package com.sirma.itt.javacourse.chat.clientSide;
 
 import java.io.IOException;
 
-import com.sirma.itt.javacourse.chat.FileLogger;
-
-
 /**
  * Launches the client-side chat application.
  */
@@ -25,7 +22,6 @@ public final class ClientLauncher {
 	 *             be instantiated.
 	 */
 	public static void main(String[] args) throws IOException {
-		FileLogger.log("this is a test log");
 		ClientGUI gui = new ClientGUI();
 		Client client = new Client();
 		new ClientController(gui, client);

@@ -3,7 +3,11 @@ package com.sirma.itt.javacourse.chat.serverSide;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import com.sirma.itt.javacourse.chat.LogFormatter;
 import com.sirma.itt.javacourse.chat.serverSide.serverCommands.CloseConnectionCommand;
 
 /**
@@ -15,14 +19,31 @@ public final class Server {
 	private ServerSocket serverSocket = null;
 	private Transmitter transmitter = null;
 	public static final char[] FORBIDDEN_CHARACTERS = { '[', ']' };
+	// the logger instance
+	private static final Logger LOGGER = Logger.getLogger(Server.class
+			.getName());
+	private FileHandler fileHandler = null;
+
 
 	/**
 	 * Constructs the server instantiating its socket and the transmitter.
 	 */
 	Server() {
+		LOGGER.setUseParentHandlers(false);
+		try {
+			fileHandler = new FileHandler("logfile%g.txt", true);
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		fileHandler.setFormatter(new LogFormatter());
+		LOGGER.addHandler(fileHandler);
+		//
 		openSocket();
 		transmitter = new Transmitter();
 		transmitter.start();
+
 	}
 
 	/**
@@ -32,7 +53,9 @@ public final class Server {
 	private void openSocket() {
 		try {
 			serverSocket = new ServerSocket(port);
+			LOGGER.info("Server socket opened at port " + port);
 		} catch (IOException e) {
+			LOGGER.log(Level.WARNING, e.getMessage(), e);
 			e.printStackTrace();
 		}
 	}
@@ -45,8 +68,9 @@ public final class Server {
 		try {
 			serverSocket.close();
 		} catch (IOException e1) {
-			e1.printStackTrace();
+			LOGGER.log(Level.WARNING, e1.getMessage(), e1);
 		}
+		LOGGER.info("Server socket closed");
 	}
 
 	/**
@@ -70,6 +94,7 @@ public final class Server {
 		Socket socket = serverSocket.accept();
 		ClientWrapper lastClient = new ClientWrapper();
 		lastClient.setSocket(socket);
+		LOGGER.info("new client socket connected");
 		return lastClient;
 	}
 

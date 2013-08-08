@@ -1,5 +1,7 @@
 package com.sirma.itt.javacourse.chat.serverSide.serverCommands;
 
+import java.io.IOException;
+
 import com.sirma.itt.javacourse.chat.clientSide.ServerListener;
 
 /**
@@ -14,6 +16,11 @@ public class CloseConnectionCommand implements ServerCommand {
 	@Override
 	public void execute(ServerListener listener) {
 		listener.getClientController().log("Server closed the connection");
+		try {
+			listener.getSocket().close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		listener.getClientController().deactivate();
 	}
 }

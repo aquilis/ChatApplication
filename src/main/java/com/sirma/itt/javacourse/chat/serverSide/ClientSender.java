@@ -80,8 +80,8 @@ public class ClientSender extends Thread {
 				break;
 			}
 		}
-		// if the client listener is still not terminated, send it a null object
-		// to stop it
+		// if the server listener on the client side is still not terminated,
+		// send it a null object to stop it
 		try {
 			if ((out != null) && (socket != null)) {
 				out.writeObject(null);
