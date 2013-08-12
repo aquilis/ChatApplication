@@ -5,7 +5,10 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
 
+import com.sirma.itt.javacourse.chat.LogHandlersManager;
 import com.sirma.itt.javacourse.chat.clientSide.clientCommands.ClientCommand;
 import com.sirma.itt.javacourse.chat.clientSide.clientCommands.JoinRequestCommand;
 
@@ -18,6 +21,23 @@ public final class Client {
 	private String nickname = null;
 	private Socket clientSocket = null;
 	private ServerSender sender = null;
+	// the logger instance and handlers
+	private static final Logger LOGGER = Logger.getLogger(Client.class
+			.getName());
+	private final FileHandler fileHandler = LogHandlersManager
+			.getClientHandler();
+
+	/**
+	 * Throws the checked exception from the INEt address upper in the
+	 * hierarchy. sets the file handler for the logger class.
+	 * 
+	 * @throws IOException
+	 *             if problem with the IO
+	 */
+	Client() throws IOException {
+		LOGGER.setUseParentHandlers(false);
+		LOGGER.addHandler(fileHandler);
+	}
 
 	/**
 	 * Using the sender thread, sends the given command to the server.
@@ -27,6 +47,8 @@ public final class Client {
 	 */
 	public void sendCommand(ClientCommand cmd) {
 		this.sender.sendCommand(cmd);
+		LOGGER.info("Command was sent to server. Commands type: "
+				+ cmd.getClass().getCanonicalName());
 	}
 
 	/**
@@ -46,16 +68,6 @@ public final class Client {
 	 */
 	public String getNickname() {
 		return this.nickname;
-	}
-
-	/**
-	 * Throws the checked exception from the INEt address upper in the
-	 * hierarchy.
-	 * 
-	 * @throws IOException
-	 *             if problem with the IO
-	 */
-	Client() throws IOException {
 	}
 
 	/**
@@ -98,6 +110,8 @@ public final class Client {
 	 */
 	public void join(ClientController controller) throws IOException {
 		clientSocket = new Socket(address, port);
+		LOGGER.info("client socket opened at port " + port + "address:"
+				+ address);
 		sender = new ServerSender(clientSocket);
 		new ServerListener(clientSocket, sender, controller);
 		sender.sendCommand(new JoinRequestCommand(nickname));

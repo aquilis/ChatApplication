@@ -3,21 +3,28 @@ package com.sirma.itt.javacourse.chat.serverSide;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
 
+import com.sirma.itt.javacourse.chat.LogHandlersManager;
 import com.sirma.itt.javacourse.chat.clientSide.clientCommands.ClientCommand;
 import com.sirma.itt.javacourse.chat.serverSide.serverCommands.MessageToClientCommand;
 import com.sirma.itt.javacourse.chat.serverSide.serverCommands.RemoveOnlineClientCommand;
 
 /**
- * A handler class for each client. Waits for messages and commands from the
- * client socket. If a command arrives, parses it and executes it. If a message
- * arrives, send it to the transmitter to be sent to all other clients.
+ * A handler class for each client. Waits for commands from the client and
+ * executes them.
  */
 public class ClientListener extends Thread {
 	private Transmitter transmitter = null;
 	private ObjectInputStream in = null;
 	private ClientWrapper client = null;
 	private ServerController controller = null;
+	// the logger instance and handlers
+	private static final Logger LOGGER = Logger.getLogger(ClientListener.class
+			.getName());
+	private final FileHandler fileHandler = LogHandlersManager
+			.getServerHandler();
 
 	/**
 	 * Gets the server application's GUI.
@@ -71,6 +78,9 @@ public class ClientListener extends Thread {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		// logger
+		LOGGER.setUseParentHandlers(false);
+		LOGGER.addHandler(fileHandler);
 	}
 
 	@Override
@@ -79,6 +89,8 @@ public class ClientListener extends Thread {
 		try {
 			while ((input = in.readObject()) != null) {
 				ClientCommand incomingCommand = (ClientCommand) input;
+				LOGGER.info("New commmand from client received. Command type: "
+						+ incomingCommand.getClass().getCanonicalName());
 				incomingCommand.execute(this);
 			}
 		} catch (IOException e) {
@@ -86,6 +98,8 @@ public class ClientListener extends Thread {
 			// sending the appropriate command.
 			client.getSender().deactivate();
 			if (!"".equals(client.getNickname())) {
+				LOGGER.info("Listener lost connection with "
+						+ client.getNickname());
 				controller.log("Connection with " + client.getNickname()
 						+ " lost");
 				transmitter.sendCommand(new MessageToClientCommand(client
@@ -99,10 +113,12 @@ public class ClientListener extends Thread {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} finally {
+			LOGGER.info("Client listener thread terminated.");
 			// clean up
 			try {
 				in.close();
 			} catch (IOException e) {
+				LOGGER.warning("Error closing the input stream.");
 				e.printStackTrace();
 			}
 		}

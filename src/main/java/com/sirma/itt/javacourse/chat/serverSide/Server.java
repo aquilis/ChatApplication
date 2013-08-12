@@ -7,7 +7,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.sirma.itt.javacourse.chat.LogFormatter;
+import com.sirma.itt.javacourse.chat.LogHandlersManager;
 import com.sirma.itt.javacourse.chat.serverSide.serverCommands.CloseConnectionCommand;
 
 /**
@@ -19,31 +19,25 @@ public final class Server {
 	private ServerSocket serverSocket = null;
 	private Transmitter transmitter = null;
 	public static final char[] FORBIDDEN_CHARACTERS = { '[', ']' };
-	// the logger instance
+
+	// the logger instance and handlers
 	private static final Logger LOGGER = Logger.getLogger(Server.class
 			.getName());
-	private FileHandler fileHandler = null;
+	private final FileHandler fileHandler = LogHandlersManager
+			.getServerHandler();
 
 
 	/**
 	 * Constructs the server instantiating its socket and the transmitter.
 	 */
 	Server() {
+		// logger
 		LOGGER.setUseParentHandlers(false);
-		try {
-			fileHandler = new FileHandler("logfile%g.txt", true);
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		fileHandler.setFormatter(new LogFormatter());
 		LOGGER.addHandler(fileHandler);
 		//
 		openSocket();
 		transmitter = new Transmitter();
 		transmitter.start();
-
 	}
 
 	/**
@@ -119,7 +113,7 @@ public final class Server {
 	 *            the listener thread needs the transmitter to send the received
 	 *            commands to all
 	 * @param controller
-	 *            the listener thread also need the controller so that the
+	 *            the listener thread also needs the controller so that the
 	 *            incoming commands can execute using its functionality
 	 */
 	public void attachClientListener(ClientWrapper client,
@@ -129,6 +123,6 @@ public final class Server {
 		client.setListener(listener);
 		listener.start();
 		controller.log("listener thread started");
+		LOGGER.info("New client listener thread started");
 	}
-
 }

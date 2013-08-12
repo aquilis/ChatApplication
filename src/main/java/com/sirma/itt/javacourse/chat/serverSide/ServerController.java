@@ -50,7 +50,7 @@ public class ServerController {
 	}
 
 	/**
-	 * Attach action listeners to the GUI buttons.
+	 * Attaches action listeners to the GUI buttons.
 	 */
 	private void attachButtonsActionListeners() {
 		ActionListener stopButtonListener = new ActionListener() {

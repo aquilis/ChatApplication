@@ -3,7 +3,10 @@ package com.sirma.itt.javacourse.chat.clientSide;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
 
+import com.sirma.itt.javacourse.chat.LogHandlersManager;
 import com.sirma.itt.javacourse.chat.serverSide.serverCommands.ServerCommand;
 
 /**
@@ -15,6 +18,11 @@ public class ServerListener extends Thread {
 	private ServerSender sender = null;
 	private ClientController controller = null;
 	private Socket socket = null;
+	// the logger instance and handlers
+	private static final Logger LOGGER = Logger.getLogger(ServerListener.class
+			.getName());
+	private final FileHandler fileHandler = LogHandlersManager
+			.getClientHandler();
 
 	/**
 	 * Constructs the client listener thread.
@@ -38,6 +46,8 @@ public class ServerListener extends Thread {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		LOGGER.setUseParentHandlers(false);
+		LOGGER.addHandler(fileHandler);
 		start();
 	}
 
@@ -75,10 +85,13 @@ public class ServerListener extends Thread {
 		try {
 			while ((input = in.readObject()) != null) {
 				ServerCommand incomingCommand = (ServerCommand) input;
+				LOGGER.info("Command received from server. Command type: "
+						+ incomingCommand.getClass().getCanonicalName());
 				incomingCommand.execute(this);
 			}
 		} catch (IOException e) {
 			// block entered when the connection to server unexpectedly drops.
+			LOGGER.info("Connection to server lost");
 			controller.log("Connection to server lost");
 			controller.deactivate();
 			// the sender thread is not needed anymore
@@ -87,6 +100,7 @@ public class ServerListener extends Thread {
 			e.printStackTrace();
 		} catch (NullPointerException e) {
 		} finally {
+			LOGGER.info("server listener thread terminated.");
 			// clean up
 			try {
 				in.close();
