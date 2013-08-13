@@ -41,13 +41,14 @@ public class ServerListener extends Thread {
 		this.socket = socket;
 		this.sender = sender;
 		this.controller = controller;
+		LOGGER.setUseParentHandlers(false);
+		LOGGER.addHandler(fileHandler);
 		try {
 			in = new ObjectInputStream(socket.getInputStream());
 		} catch (IOException e) {
+			LOGGER.warning("Error opening Object input stream");
 			e.printStackTrace();
 		}
-		LOGGER.setUseParentHandlers(false);
-		LOGGER.addHandler(fileHandler);
 		start();
 	}
 

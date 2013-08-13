@@ -3,6 +3,10 @@ package com.sirma.itt.javacourse.chat.serverSide;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+
+import com.sirma.itt.javacourse.chat.LogHandlersManager;
 
 /**
  * The controller class that implements the MVC architecture. Mediates all
@@ -15,6 +19,11 @@ public class ServerController {
 	private ServerGUI gui = null;
 	// the model
 	private Server server = null;
+	// logger
+	private static final Logger LOGGER = Logger
+			.getLogger(ServerController.class.getName());
+	private final FileHandler fileHandler = LogHandlersManager
+			.getServerHandler();
 
 	/**
 	 * Constructs the controller with a server GUI and a server class that
@@ -28,6 +37,8 @@ public class ServerController {
 	public ServerController(ServerGUI gui, Server server) {
 		this.gui = gui;
 		this.server = server;
+		LOGGER.setUseParentHandlers(false);
+		LOGGER.addHandler(fileHandler);
 		attachButtonsActionListeners();
 		handleClients();
 	}
@@ -56,12 +67,9 @@ public class ServerController {
 		ActionListener stopButtonListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				LOGGER.info("Connection stopped from server");
 				log("Connection stopped from server");
 				gui.deactivate();
-				if (server == null) {
-					System.out.println("Server is null");
-					return;
-				}
 				server.stopServer();
 			}
 		};

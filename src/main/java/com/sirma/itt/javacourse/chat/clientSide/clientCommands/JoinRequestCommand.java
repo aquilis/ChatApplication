@@ -98,15 +98,8 @@ public class JoinRequestCommand implements ClientCommand {
 			// send the new client a welcome message
 			client.getSender().sendCommand(
 					new MessageToClientCommand("Welcome to chat room!"));
-
 		} else {
 			client.getSender().sendCommand(new AccessDeniedCommand());
-			// try {
-			// // wait for 1 second before terminating the client sender thread
-			// Thread.sleep(1000);
-			// } catch (InterruptedException e) {
-			// e.printStackTrace();
-			// }
 			client.getSender().deactivate();
 		}
 	}

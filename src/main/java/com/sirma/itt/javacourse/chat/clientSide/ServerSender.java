@@ -25,10 +25,10 @@ public class ServerSender extends Thread {
 	}
 
 	/**
-	 * Construct the sender where the messages will be sent.
+	 * Constructs the sender.
 	 * 
 	 * @param socket
-	 *            is the socket where to send the client messages
+	 *            is the socket where the client messages will be sent
 	 */
 	public ServerSender(Socket socket) {
 		this.socket = socket;

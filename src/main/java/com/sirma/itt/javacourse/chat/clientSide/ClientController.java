@@ -4,7 +4,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
 
+import com.sirma.itt.javacourse.chat.LogHandlersManager;
 import com.sirma.itt.javacourse.chat.clientSide.clientCommands.DisconnectCommand;
 import com.sirma.itt.javacourse.chat.clientSide.clientCommands.MessageToServerCommand;
 
@@ -23,6 +26,11 @@ public class ClientController {
 	private ArrayList<String> onlineClients = new ArrayList<String>();
 	// reference used inside the action listeners
 	private final ClientController thisController = this;
+	// logger
+	private static final Logger LOGGER = Logger
+			.getLogger(ClientController.class.getName());
+	private final FileHandler fileHandler = LogHandlersManager
+			.getClientHandler();
 
 	/**
 	 * Constructs the controller with a view and model classes.
@@ -35,6 +43,8 @@ public class ClientController {
 	public ClientController(final ClientGUI gui, final Client client) {
 		this.gui = gui;
 		this.client = client;
+		LOGGER.setUseParentHandlers(false);
+		LOGGER.addHandler(fileHandler);
 		attachButtonsActionListeners();
 	}
 
@@ -53,9 +63,11 @@ public class ClientController {
 					try {
 						client.join(thisController);
 					} catch (IOException e1) {
+						LOGGER.warning("Can't find host on the specified port and address");
 						showError("Unable to find server", "Connection error");
 					}
 				} else {
+					LOGGER.info("Client specified invalid length for the nickname. Join cancelled");
 					showError(
 							"Your nickname must be at least 3 characters long and no more than 20",
 							"nickname length error");
@@ -83,6 +95,7 @@ public class ClientController {
 		ActionListener disconnectButtonListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				LOGGER.info("Client left the chat room");
 				log("You left the chat room");
 				client.sendCommand(new DisconnectCommand());
 				deactivate();

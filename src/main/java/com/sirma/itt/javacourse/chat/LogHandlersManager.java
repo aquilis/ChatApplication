@@ -4,15 +4,15 @@ import java.io.IOException;
 import java.util.logging.FileHandler;
 
 /**
- * Provides global file handlers for output of the log information that can be
- * used from all classes via the access methods. This way, all server/client
- * side classes can log to their respective single file predefined here.
+ * Provides global file handlers for the loggers. This way, all server/client
+ * side classes can log to their respective single file predefined here. Uses
+ * singleton for the handler instances.
  */
 public final class LogHandlersManager {
 	private static FileHandler serverHandler = null;
 	private static FileHandler clientHandler = null;
-	private static final String SERVER_LOG_FILENAME = "serverLogfile.txt";
-	private static final String CLIENT_LOG_FILENAME = "clientLogfile.txt";
+	private static final String SERVER_LOG_FILENAME = "serverLogs.txt";
+	private static final String CLIENT_LOG_FILENAME = "clientLogs.txt";
 
 	/**
 	 * Utility class.

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.logging.FileHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.sirma.itt.javacourse.chat.LogHandlersManager;
@@ -73,14 +74,15 @@ public class ClientListener extends Thread {
 		this.transmitter = transmitter;
 		this.client = client;
 		Socket socket = client.getSocket();
-		try {
-			in = new ObjectInputStream(socket.getInputStream());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		// logger
 		LOGGER.setUseParentHandlers(false);
 		LOGGER.addHandler(fileHandler);
+		try {
+			in = new ObjectInputStream(socket.getInputStream());
+		} catch (IOException e) {
+			// e.printStackTrace();
+			LOGGER.log(Level.WARNING, e.getMessage(), e);
+		}
 	}
 
 	@Override
@@ -89,7 +91,8 @@ public class ClientListener extends Thread {
 		try {
 			while ((input = in.readObject()) != null) {
 				ClientCommand incomingCommand = (ClientCommand) input;
-				LOGGER.info("New commmand from client received. Command type: "
+				LOGGER.info("New commmand from client " + client.getNickname()
+						+ " received. Command type: "
 						+ incomingCommand.getClass().getCanonicalName());
 				incomingCommand.execute(this);
 			}
@@ -111,15 +114,17 @@ public class ClientListener extends Thread {
 						.getNickname()));
 			}
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			// e.printStackTrace();
+			LOGGER.log(Level.WARNING, e.getMessage(), e);
 		} finally {
-			LOGGER.info("Client listener thread terminated.");
+			LOGGER.info("Client listener thread for " + client.getNickname()
+					+ " terminated.");
 			// clean up
 			try {
 				in.close();
 			} catch (IOException e) {
-				LOGGER.warning("Error closing the input stream.");
-				e.printStackTrace();
+				LOGGER.warning("Error closing the input stream for client "
+						+ client.getNickname());
 			}
 		}
 	}

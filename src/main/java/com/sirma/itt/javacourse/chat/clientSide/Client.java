@@ -47,8 +47,6 @@ public final class Client {
 	 */
 	public void sendCommand(ClientCommand cmd) {
 		this.sender.sendCommand(cmd);
-		LOGGER.info("Command was sent to server. Commands type: "
-				+ cmd.getClass().getCanonicalName());
 	}
 
 	/**
@@ -110,7 +108,7 @@ public final class Client {
 	 */
 	public void join(ClientController controller) throws IOException {
 		clientSocket = new Socket(address, port);
-		LOGGER.info("client socket opened at port " + port + "address:"
+		LOGGER.info("client socket opened at port " + port + " | address: "
 				+ address);
 		sender = new ServerSender(clientSocket);
 		new ServerListener(clientSocket, sender, controller);
