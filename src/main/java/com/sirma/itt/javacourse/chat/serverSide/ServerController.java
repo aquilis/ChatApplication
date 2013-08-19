@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
+import com.sirma.itt.javacourse.chat.LanguageManager;
 import com.sirma.itt.javacourse.chat.LogHandlersManager;
 
 /**
@@ -67,8 +68,9 @@ public class ServerController {
 		ActionListener stopButtonListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				LOGGER.info("Connection stopped from server");
-				log("Connection stopped from server");
+				LOGGER.info(LanguageManager
+						.getString("connectionStoppedFromServer"));
+				log(LanguageManager.getString("connectionStoppedFromServer"));
 				gui.deactivate();
 				server.stopServer();
 			}

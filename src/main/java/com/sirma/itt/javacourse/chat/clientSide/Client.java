@@ -1,7 +1,6 @@
 package com.sirma.itt.javacourse.chat.clientSide;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,8 +15,8 @@ import com.sirma.itt.javacourse.chat.clientSide.clientCommands.JoinRequestComman
  * Contains the basic business (back-end) logic for the client-side application.
  */
 public final class Client {
-	private final int port = 7000;
-	private final InetAddress address = InetAddress.getByName("localhost");
+	// private final int port = 7000;
+	// private final InetAddress address = InetAddress.getByName("localhost");
 	private String nickname = null;
 	private Socket clientSocket = null;
 	private ServerSender sender = null;
@@ -97,16 +96,21 @@ public final class Client {
 	}
 
 	/**
-	 * Opens the connection to the server and starts the sender and listener
-	 * threads.
+	 * Opens the connection to the server at the given port and address and
+	 * starts the sender and listener threads.
 	 * 
+	 * @param port
+	 *            is the port to connect to
+	 * @param address
+	 *            is the INET address to connect to
 	 * @param controller
 	 *            is the client controller. Needed for the listener thread where
 	 *            all received commands from the server will be executed
 	 * @throws IOException
 	 *             if a socket to the server can't be opened
 	 */
-	public void join(ClientController controller) throws IOException {
+	public void join(int port, String address, ClientController controller)
+			throws IOException {
 		clientSocket = new Socket(address, port);
 		LOGGER.info("client socket opened at port " + port + " | address: "
 				+ address);

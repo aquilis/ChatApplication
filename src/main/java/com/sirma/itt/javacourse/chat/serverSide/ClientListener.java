@@ -7,6 +7,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.sirma.itt.javacourse.chat.LanguageManager;
 import com.sirma.itt.javacourse.chat.LogHandlersManager;
 import com.sirma.itt.javacourse.chat.clientSide.clientCommands.ClientCommand;
 import com.sirma.itt.javacourse.chat.serverSide.serverCommands.MessageToClientCommand;
@@ -103,12 +104,14 @@ public class ClientListener extends Thread {
 			if (!"".equals(client.getNickname())) {
 				LOGGER.info("Listener lost connection with "
 						+ client.getNickname());
-				controller.log("Connection with " + client.getNickname()
-						+ " lost");
+				controller.log(LanguageManager.getString("connectionLost")
+						+ " " + client.getNickname());
 				transmitter.sendCommand(new MessageToClientCommand(client
-						.getNickname() + " disconnected"));
-				controller
-						.log("Disconnect notifying message sent to all clients ");
+						.getNickname()
+						+ " "
+						+ LanguageManager.getString("disconnected")));
+				controller.log(LanguageManager
+						.getString("disconnectNotificationSent"));
 				transmitter.removeClient(client);
 				transmitter.sendCommand(new RemoveOnlineClientCommand(client
 						.getNickname()));

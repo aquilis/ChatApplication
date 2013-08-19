@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -14,17 +15,26 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import com.sirma.itt.javacourse.chat.LanguageManager;
+
 /**
  * The user interface of the client application. Creates and draws all GUI
  * components and provides access methods for the controller class (MVC).
  */
 public class ClientGUI {
+
 	private int currentForm = 1;
 	// login form components
 	private JFrame loginForm = null;
 	private JTextField nicknameTextBox = null;
 	private JButton joinButton = null;
 	private JLabel welcomeLabel = null;
+	private JLabel portLabel = null;
+	private JTextField portTextBox = null;
+	private JLabel addressLabel = null;
+	private JTextField addressTextBox = null;
+	private JLabel languagesLabel = null;
+	private JComboBox languagesBox = null;
 	// main form components
 	private JFrame mainForm = null;
 	private JTextArea logBox = null;
@@ -48,14 +58,23 @@ public class ClientGUI {
 	 * Instantiates the login form with all of its components.
 	 */
 	private void createLoginForm() {
-		loginForm = new JFrame("Chat application | Login");
+		loginForm = new JFrame(LanguageManager.getString("clientLoginCaption"));
 		loginForm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		loginForm.setLayout(new FlowLayout(FlowLayout.LEADING, 24, 24));
-		loginForm.setSize(new Dimension(350, 300));
+		loginForm.setSize(new Dimension(320, 380));
 		loginForm.setResizable(false);
 		createWelcomeLabel();
 		createJoinButton();
 		createNicknameTextBox();
+		createPortInput();
+		createAddressInput();
+		createLanguagesBox();
+		loginForm.getContentPane().add(portLabel);
+		loginForm.getContentPane().add(portTextBox);
+		loginForm.getContentPane().add(addressLabel);
+		loginForm.getContentPane().add(addressTextBox);
+		loginForm.getContentPane().add(languagesLabel);
+		loginForm.getContentPane().add(languagesBox);
 		loginForm.getContentPane().add(welcomeLabel);
 		loginForm.getContentPane().add(nicknameTextBox);
 		loginForm.getContentPane().add(joinButton);
@@ -66,7 +85,7 @@ public class ClientGUI {
 	 * components.
 	 */
 	private void createMainForm() {
-		mainForm = new JFrame("Chat application");
+		mainForm = new JFrame();
 		mainForm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainForm.setLayout(new FlowLayout(FlowLayout.LEADING, 24, 24));
 		mainForm.setSize(new Dimension(700, 480));
@@ -103,11 +122,55 @@ public class ClientGUI {
 	}
 
 	/**
+	 * Creates the label and the text box where he user will input the desired
+	 * port to join.
+	 */
+	private void createPortInput() {
+		portLabel = new JLabel(
+				LanguageManager.getString("clientPortInputLabel"));
+		portTextBox = new JTextField(7);
+	}
+
+	/**
+	 * Creates the label and the text box where he user will input the desired
+	 * INET address to join.
+	 */
+	private void createAddressInput() {
+		addressLabel = new JLabel(
+				LanguageManager.getString("clientAddressInputLabel"));
+		addressTextBox = new JTextField(7);
+	}
+
+	/**
 	 * Creates the text box where the user will input his nickname.
 	 */
 	private void createNicknameTextBox() {
 		nicknameTextBox = new JTextField(23);
 		nicknameTextBox.setPreferredSize(new Dimension(100, 24));
+	}
+
+	/**
+	 * Attaches an action listener to the combo box where the user chooses the
+	 * GUI language.
+	 * 
+	 * @param listener
+	 *            is the new listener to set
+	 */
+	public void setLanguagesBoxListener(ActionListener listener) {
+		languagesBox.addActionListener(listener);
+	}
+
+	/**
+	 * Creates the combo box used by the user to select a language and the label
+	 * for the combo box.
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void createLanguagesBox() {
+		languagesLabel = new JLabel(
+				LanguageManager.getString("clientLanguagesLabel"));
+		String[] languages = { "en", "bg" };
+		languagesBox = new JComboBox(languages);
+		languagesBox.setSelectedIndex(0);
 	}
 
 	/**
@@ -118,7 +181,7 @@ public class ClientGUI {
 		logBox = new JTextArea(5, 30);
 		logBox.setBorder(BorderFactory.createLoweredBevelBorder());
 		logBox.setEditable(false);
-		logBox.append("Client activity log:\n");
+		logBox.append(LanguageManager.getString("clientLogBoxCaption") + "\n");
 		logBoxPane = new JScrollPane(logBox);
 		logBoxPane.setPreferredSize(new Dimension(400, 300));
 	}
@@ -130,7 +193,6 @@ public class ClientGUI {
 		onlineUsersBox = new JTextArea(5, 15);
 		onlineUsersBox.setBorder(BorderFactory.createLoweredBevelBorder());
 		onlineUsersBox.setEditable(false);
-		onlineUsersBox.append("Online users:");
 		onlineUsersPane = new JScrollPane(onlineUsersBox);
 		onlineUsersPane.setPreferredSize(new Dimension(180, 300));
 	}
@@ -159,7 +221,7 @@ public class ClientGUI {
 	 * attaches it an action listener.
 	 */
 	private void createSendButton() {
-		sendButton = new JButton("Send");
+		sendButton = new JButton(LanguageManager.getString("clientSendButton"));
 		sendButton.setPreferredSize(new Dimension(80, 32));
 	}
 
@@ -178,7 +240,8 @@ public class ClientGUI {
 	 * Creates the disconnect button that ends the current session.
 	 */
 	private void createDisconnectButton() {
-		disconnectButton = new JButton("Leave");
+		disconnectButton = new JButton(
+				LanguageManager.getString("clientDisconnectButton"));
 		disconnectButton.setPreferredSize(new Dimension(80, 32));
 	}
 
@@ -187,7 +250,7 @@ public class ClientGUI {
 	 */
 	private void createWelcomeLabel() {
 		welcomeLabel = new JLabel(
-				"<html>Welcome to chat application.<br><br>Please, enter your nickname");
+				LanguageManager.getString("loginFormNicknameText"));
 		welcomeLabel.setPreferredSize(new Dimension(350, 64));
 	}
 
@@ -205,7 +268,7 @@ public class ClientGUI {
 	 * Creates the join button used to request join to the server.
 	 */
 	private void createJoinButton() {
-		joinButton = new JButton("Join");
+		joinButton = new JButton(LanguageManager.getString("clientJoinButton"));
 		joinButton.setPreferredSize(new Dimension(80, 32));
 	}
 
@@ -225,6 +288,34 @@ public class ClientGUI {
 	 */
 	public JTextField getNicknameTextBox() {
 		return nicknameTextBox;
+	}
+
+	/**
+	 * Gets the text box where the user inputs the desired port.
+	 * 
+	 * @return the text box where the user inputs the port
+	 */
+	public JTextField getPortTextBox() {
+		return portTextBox;
+	}
+
+	/**
+	 * Gets the text box where the user inputs the desired address.
+	 * 
+	 * @return the text box where the user inputs the address
+	 */
+	public JTextField getAddressTextBox() {
+		return addressTextBox;
+	}
+
+	/**
+	 * Gets the combo box where the user chooses a language.
+	 * 
+	 * @return the combo box where the user chooses a language
+	 */
+	@SuppressWarnings("rawtypes")
+	public JComboBox getLanguagesBox() {
+		return languagesBox;
 	}
 
 	/**
@@ -256,7 +347,7 @@ public class ClientGUI {
 	 *            is the list of client nicknames to draw onto the GUI panel
 	 */
 	public void updateOnlineUsersPanel(ArrayList<String> onlineClients) {
-		onlineUsersBox.setText("Online users:");
+		onlineUsersBox.setText(LanguageManager.getString("onlineUsersCaption"));
 		for (String nickname : onlineClients) {
 			onlineUsersBox.append("\n" + nickname);
 		}

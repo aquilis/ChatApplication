@@ -7,6 +7,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.sirma.itt.javacourse.chat.LanguageManager;
 import com.sirma.itt.javacourse.chat.LogHandlersManager;
 import com.sirma.itt.javacourse.chat.serverSide.serverCommands.CloseConnectionCommand;
 
@@ -122,7 +123,7 @@ public final class Server {
 				controller);
 		client.setListener(listener);
 		listener.start();
-		controller.log("listener thread started");
+		controller.log(LanguageManager.getString("listenerStarted"));
 		LOGGER.info("New client listener thread started");
 	}
 }

@@ -1,5 +1,6 @@
 package com.sirma.itt.javacourse.chat.serverSide;
 
+
 /**
  * Launches the server-side application.
  */

@@ -12,6 +12,8 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import com.sirma.itt.javacourse.chat.LanguageManager;
+
 /**
  * The GUI part of the server application.
  */
@@ -28,10 +30,10 @@ public class ServerGUI extends JFrame {
 	 * Constructs the interface.
 	 */
 	public ServerGUI() {
-		setTitle("Server application");
+		setTitle(LanguageManager.getString("serverCaption"));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(new FlowLayout(FlowLayout.LEADING, 6, 6));
-		setSize(new Dimension(550, 250));
+		setSize(new Dimension(600, 250));
 		setResizable(false);
 		createScrollPane();
 		createStopButton();
@@ -68,7 +70,7 @@ public class ServerGUI extends JFrame {
 		logBox = new JTextArea(5, 30);
 		logBox.setBorder(BorderFactory.createLoweredBevelBorder());
 		logBox.setEditable(false);
-		logBox.append("Server activity log:");
+		logBox.append(LanguageManager.getString("serverLogBoxCaption"));
 		scrollPane = new JScrollPane(logBox);
 		scrollPane.setPreferredSize(new Dimension(400, 200));
 	}
@@ -87,7 +89,7 @@ public class ServerGUI extends JFrame {
 	 * Creates the stop button that will stop the server.
 	 */
 	private void createStopButton() {
-		stopButton = new JButton("Stop server");
-		stopButton.setPreferredSize(new Dimension(100, 50));
+		stopButton = new JButton(LanguageManager.getString("stopServerButton"));
+		stopButton.setPreferredSize(new Dimension(150, 50));
 	}
 }

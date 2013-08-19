@@ -2,11 +2,17 @@ package com.sirma.itt.javacourse.chat.clientSide;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
+import javax.swing.JComboBox;
+
+import com.sirma.itt.javacourse.chat.LanguageManager;
 import com.sirma.itt.javacourse.chat.LogHandlersManager;
 import com.sirma.itt.javacourse.chat.clientSide.clientCommands.DisconnectCommand;
 import com.sirma.itt.javacourse.chat.clientSide.clientCommands.MessageToServerCommand;
@@ -18,6 +24,12 @@ import com.sirma.itt.javacourse.chat.clientSide.clientCommands.MessageToServerCo
  * other. Both sides interact implicitly using this class.
  */
 public class ClientController {
+	// TODO make these fields not hard-coded, but chosen by the user from the
+	// GUI module
+	private final int port = 7000;
+	private final String address = "localhost";
+	private final String language = "bg";
+
 	// the view
 	private ClientGUI gui = null;
 	// the model
@@ -46,6 +58,17 @@ public class ClientController {
 		LOGGER.setUseParentHandlers(false);
 		LOGGER.addHandler(fileHandler);
 		attachButtonsActionListeners();
+		// load the configuration file and fill the text fields with the last
+		// user properties
+		Properties prop = new Properties();
+		try {
+			prop.load(new FileInputStream("config.properties"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		gui.getPortTextBox().setText(prop.getProperty("port"));
+		gui.getAddressTextBox().setText(prop.getProperty("address"));
+		gui.getNicknameTextBox().setText(prop.getProperty("nickname"));
 	}
 
 	/**
@@ -58,19 +81,34 @@ public class ClientController {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				client.setNickname(gui.getNicknameTextBox().getText().trim());
+				// save to properties file
+				Properties prop = new Properties();
+				prop.setProperty("port", Integer.toString(port));
+				prop.setProperty("host", address);
+				prop.setProperty("nickname", gui.getNicknameTextBox().getText()
+						.trim());
+				// prop.setProperty("language", language);
+				// save properties to project root folder
+				try {
+					prop.store(new FileOutputStream("config.properties"), null);
+				} catch (IOException e2) {
+					e2.printStackTrace();
+				}
+				//
 				if (client.isNicknameLengthValid(gui.getNicknameTextBox()
 						.getText().trim())) {
 					try {
-						client.join(thisController);
+						client.join(port, address, thisController);
 					} catch (IOException e1) {
 						LOGGER.warning("Can't find host on the specified port and address");
-						showError("Unable to find server", "Connection error");
+						showError(LanguageManager.getString("noHostError"),
+								LanguageManager.getString("noHostErrorCaption"));
 					}
 				} else {
 					LOGGER.info("Client specified invalid length for the nickname. Join cancelled");
-					showError(
-							"Your nickname must be at least 3 characters long and no more than 20",
-							"nickname length error");
+					showError(LanguageManager.getString("nicknameLengthError"),
+							LanguageManager
+									.getString("nicknameLengthErrorCaption"));
 					gui.getNicknameTextBox().setText("");
 				}
 			}
@@ -84,9 +122,9 @@ public class ClientController {
 							.formatMessage(gui.getTextBox().getText().trim())));
 					gui.getTextBox().setText("");
 				} else {
-					showError(
-							"You can't send zero-sized messages or messages longer than 200 characters",
-							"message length error");
+					showError(LanguageManager.getString("messageLengthError"),
+							LanguageManager
+									.getString("messageLengthErrorCaption"));
 					gui.getNicknameTextBox().setText("");
 				}
 			}
@@ -96,9 +134,27 @@ public class ClientController {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				LOGGER.info("Client left the chat room");
-				log("You left the chat room");
+				log(LanguageManager.getString("youLeftChat"));
 				client.sendCommand(new DisconnectCommand());
 				deactivate();
+			}
+		};
+
+		// executed when a language from the combo box is chosen by the user
+		ActionListener langugaesComboBoxListener = new ActionListener() {
+			@SuppressWarnings("rawtypes")
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JComboBox cb = (JComboBox) e.getSource();
+				String language = (String) cb.getSelectedItem();
+				Properties prop = new Properties();
+				prop.setProperty("language", language);
+				try {
+					prop.store(new FileOutputStream("config.properties"), null);
+				} catch (IOException e2) {
+					e2.printStackTrace();
+				}
+				LanguageManager.refreshLanguage();
 			}
 		};
 		// attach all listeners to the buttons using the setter methods of the
@@ -106,6 +162,7 @@ public class ClientController {
 		gui.setJoinButtonListener(joinButonListener);
 		gui.setSendButtonListener(sendButtonListener);
 		gui.setDisconnectButtonListener(disconnectButtonListener);
+		gui.setLanguagesBoxListener(langugaesComboBoxListener);
 	}
 
 	/*
@@ -183,7 +240,7 @@ public class ClientController {
 	 */
 	public void moveToMainForm() {
 		gui.moveToMainForm();
-		gui.setMainFormTitle("Chat application | Logged as "
+		gui.setMainFormTitle(LanguageManager.getString("clientCaption") + " "
 				+ client.getNickname());
 	}
 }

@@ -1,5 +1,6 @@
 package com.sirma.itt.javacourse.chat.clientSide.clientCommands;
 
+import com.sirma.itt.javacourse.chat.LanguageManager;
 import com.sirma.itt.javacourse.chat.serverSide.ClientListener;
 import com.sirma.itt.javacourse.chat.serverSide.ClientWrapper;
 import com.sirma.itt.javacourse.chat.serverSide.Server;
@@ -76,7 +77,8 @@ public class JoinRequestCommand implements ClientCommand {
 		// if the requested nickname gets approved
 		if (isNicknameValid(nickname) && (isNicknameUnique(nickname))) {
 			// update server's GUI
-			listener.getController().log(nickname + " joined");
+			listener.getController().log(
+					nickname + " " + LanguageManager.getString("joined"));
 			// send the client access allowed command
 			client.getSender().sendCommand(new AccessAllowedCommand());
 			client.setNickname(nickname);
@@ -86,18 +88,19 @@ public class JoinRequestCommand implements ClientCommand {
 					.getNickname()));
 			transmitter.addClient(client);
 			listener.getController().log(
-					nickname + " was added to the list of online clients");
-			transmitter.sendCommand(new MessageToClientCommand(nickname
-					+ " connected"));
+					nickname + " " + LanguageManager.getString("addedToList"));
+			transmitter.sendCommand(new MessageToClientCommand(nickname + " "
+					+ LanguageManager.getString("joined")));
 			listener.getController().log(
-					"Notifying message for a new client sent to all clients");
+					LanguageManager.getString("NewClientNotificationSent"));
 			// send the new client the list of all online clients
 			client.getSender().sendCommand(
 					new SendOnlineClientsCommand(transmitter
 							.getAllClientNicknames()));
 			// send the new client a welcome message
 			client.getSender().sendCommand(
-					new MessageToClientCommand("Welcome to chat room!"));
+					new MessageToClientCommand(LanguageManager
+							.getString("welcomeMessage")));
 		} else {
 			client.getSender().sendCommand(new AccessDeniedCommand());
 			client.getSender().deactivate();

@@ -1,5 +1,6 @@
 package com.sirma.itt.javacourse.chat.clientSide.clientCommands;
 
+import com.sirma.itt.javacourse.chat.LanguageManager;
 import com.sirma.itt.javacourse.chat.serverSide.ClientListener;
 import com.sirma.itt.javacourse.chat.serverSide.ClientWrapper;
 import com.sirma.itt.javacourse.chat.serverSide.Transmitter;
@@ -20,10 +21,9 @@ public class DisconnectCommand implements ClientCommand {
 	public void execute(ClientListener listener) {
 		this.transmitter = listener.getTransmitter();
 		this.client = listener.getClient();
-		// transmitter.sendCommand(new
-		// MessageToClientCommand(client.getNickname()
-		// + " disconnected"));
-		listener.getController().log(client.getNickname() + " disconnencted");
+		listener.getController().log(
+				client.getNickname() + " "
+						+ LanguageManager.getString("disconnected"));
 		client.getSender().deactivate();
 		transmitter.removeClient(client);
 		transmitter.sendCommand(new RemoveOnlineClientCommand(client

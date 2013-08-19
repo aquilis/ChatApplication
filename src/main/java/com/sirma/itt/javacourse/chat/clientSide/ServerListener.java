@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
+import com.sirma.itt.javacourse.chat.LanguageManager;
 import com.sirma.itt.javacourse.chat.LogHandlersManager;
 import com.sirma.itt.javacourse.chat.serverSide.serverCommands.ServerCommand;
 
@@ -93,7 +94,7 @@ public class ServerListener extends Thread {
 		} catch (IOException e) {
 			// block entered when the connection to server unexpectedly drops.
 			LOGGER.info("Connection to server lost");
-			controller.log("Connection to server lost");
+			controller.log(LanguageManager.getString("connectionToServerLost"));
 			controller.deactivate();
 			// the sender thread is not needed anymore
 			sender.deactivate();
