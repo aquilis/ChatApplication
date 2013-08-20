@@ -24,12 +24,6 @@ import com.sirma.itt.javacourse.chat.clientSide.clientCommands.MessageToServerCo
  * other. Both sides interact implicitly using this class.
  */
 public class ClientController {
-	// TODO make these fields not hard-coded, but chosen by the user from the
-	// GUI module
-	private final int port = 7000;
-	private final String address = "localhost";
-	private final String language = "bg";
-
 	// the view
 	private ClientGUI gui = null;
 	// the model
@@ -43,6 +37,14 @@ public class ClientController {
 			.getLogger(ClientController.class.getName());
 	private final FileHandler fileHandler = LogHandlersManager
 			.getClientHandler();
+	// The properties files and variables needed to be saved for
+	// further use
+	private static final String LANGUAGE_FILE = "lang.properties";
+	private static final String PROPERTIES_FILE = "clientConfig.properties";
+	private int port;
+	private String address;
+	private String currentLanguage;
+	private boolean hasLanguageChanged;
 
 	/**
 	 * Constructs the controller with a view and model classes.
@@ -58,17 +60,47 @@ public class ClientController {
 		LOGGER.setUseParentHandlers(false);
 		LOGGER.addHandler(fileHandler);
 		attachButtonsActionListeners();
-		// load the configuration file and fill the text fields with the last
-		// user properties
+		loadProperties();
+	}
+
+	/**
+	 * Loads the properties from the properties files and updates the client GUI
+	 * and language.
+	 */
+	private void loadProperties() {
 		Properties prop = new Properties();
+		Properties langProp = new Properties();
 		try {
-			prop.load(new FileInputStream("config.properties"));
+			prop.load(new FileInputStream(PROPERTIES_FILE));
+			langProp.load(new FileInputStream(LANGUAGE_FILE));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		gui.getPortTextBox().setText(prop.getProperty("port"));
 		gui.getAddressTextBox().setText(prop.getProperty("address"));
 		gui.getNicknameTextBox().setText(prop.getProperty("nickname"));
+		gui.getLanguagesBox().setSelectedItem(langProp.getProperty("language"));
+		hasLanguageChanged = false;
+	}
+
+	/**
+	 * Gets the chosen properties from the client GUI and save them to the
+	 * properties files.
+	 */
+	private void saveProperties() {
+		Properties prop = new Properties();
+		Properties langProp = new Properties();
+		prop.setProperty("port", Integer.toString(port));
+		prop.setProperty("address", address);
+		prop.setProperty("nickname", gui.getNicknameTextBox().getText().trim());
+		langProp.setProperty("language", currentLanguage);
+		// save properties to project root folder
+		try {
+			prop.store(new FileOutputStream(PROPERTIES_FILE), null);
+			langProp.store(new FileOutputStream(LANGUAGE_FILE), null);
+		} catch (IOException e2) {
+			e2.printStackTrace();
+		}
 	}
 
 	/**
@@ -81,26 +113,27 @@ public class ClientController {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				client.setNickname(gui.getNicknameTextBox().getText().trim());
-				// save to properties file
-				Properties prop = new Properties();
-				prop.setProperty("port", Integer.toString(port));
-				prop.setProperty("host", address);
-				prop.setProperty("nickname", gui.getNicknameTextBox().getText()
-						.trim());
-				// prop.setProperty("language", language);
-				// save properties to project root folder
 				try {
-					prop.store(new FileOutputStream("config.properties"), null);
-				} catch (IOException e2) {
-					e2.printStackTrace();
+					port = Integer.parseInt(gui.getPortTextBox().getText());
+				} catch (NumberFormatException e1) {
+					gui.showError(LanguageManager.getString("portFormatError"),
+							LanguageManager.getString("portFormatErrorCaption"));
 				}
-				//
+				address = gui.getAddressTextBox().getText();
+				saveProperties();
+				if (hasLanguageChanged) {
+					gui.showInfoMessage(LanguageManager
+							.getString("languageChangesMessage"),
+							LanguageManager
+									.getString("languageChangesMessageCaption"));
+				}
 				if (client.isNicknameLengthValid(gui.getNicknameTextBox()
 						.getText().trim())) {
 					try {
 						client.join(port, address, thisController);
 					} catch (IOException e1) {
-						LOGGER.warning("Can't find host on the specified port and address");
+						LOGGER.warning("Can't find host on port " + port
+								+ " | address: " + address);
 						showError(LanguageManager.getString("noHostError"),
 								LanguageManager.getString("noHostErrorCaption"));
 					}
@@ -139,7 +172,6 @@ public class ClientController {
 				deactivate();
 			}
 		};
-
 		// executed when a language from the combo box is chosen by the user
 		ActionListener langugaesComboBoxListener = new ActionListener() {
 			@SuppressWarnings("rawtypes")
@@ -147,14 +179,8 @@ public class ClientController {
 			public void actionPerformed(ActionEvent e) {
 				JComboBox cb = (JComboBox) e.getSource();
 				String language = (String) cb.getSelectedItem();
-				Properties prop = new Properties();
-				prop.setProperty("language", language);
-				try {
-					prop.store(new FileOutputStream("config.properties"), null);
-				} catch (IOException e2) {
-					e2.printStackTrace();
-				}
-				LanguageManager.refreshLanguage();
+				currentLanguage = language;
+				hasLanguageChanged = true;
 			}
 		};
 		// attach all listeners to the buttons using the setter methods of the

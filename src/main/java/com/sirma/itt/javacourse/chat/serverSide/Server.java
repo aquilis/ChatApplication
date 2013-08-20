@@ -1,6 +1,7 @@
 package com.sirma.itt.javacourse.chat.serverSide;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.FileHandler;
@@ -16,7 +17,6 @@ import com.sirma.itt.javacourse.chat.serverSide.serverCommands.CloseConnectionCo
  * server. The rest is handled by the handler threads and the client commands.
  */
 public final class Server {
-	private final int port = 7000;
 	private ServerSocket serverSocket = null;
 	private Transmitter transmitter = null;
 	public static final char[] FORBIDDEN_CHARACTERS = { '[', ']' };
@@ -27,7 +27,6 @@ public final class Server {
 	private final FileHandler fileHandler = LogHandlersManager
 			.getServerHandler();
 
-
 	/**
 	 * Constructs the server instantiating its socket and the transmitter.
 	 */
@@ -35,24 +34,25 @@ public final class Server {
 		// logger
 		LOGGER.setUseParentHandlers(false);
 		LOGGER.addHandler(fileHandler);
-		//
-		openSocket();
-		transmitter = new Transmitter();
-		transmitter.start();
 	}
 
 	/**
-	 * Opens a new server socket on the chosen port where the server will listen
-	 * for new clients connecting.
+	 * Opens the server socket listening at the given port and address and
+	 * starts the transmitter object.
+	 * 
+	 * @param port
+	 *            is the port to start the socket at
+	 * @param address
+	 *            is the INET address to start the socket at
+	 * @throws IOException
+	 *             if the server socket can't be opened
 	 */
-	private void openSocket() {
-		try {
-			serverSocket = new ServerSocket(port);
-			LOGGER.info("Server socket opened at port " + port);
-		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, e.getMessage(), e);
-			e.printStackTrace();
-		}
+	public void startServer(int port, String address) throws IOException {
+		serverSocket = new ServerSocket(port, 50,
+				InetAddress.getByName(address));
+		LOGGER.info("Server socket opened at port " + port);
+		transmitter = new Transmitter();
+		transmitter.start();
 	}
 
 	/**

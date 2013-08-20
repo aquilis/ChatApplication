@@ -34,6 +34,7 @@ public class ClientGUI {
 	private JLabel addressLabel = null;
 	private JTextField addressTextBox = null;
 	private JLabel languagesLabel = null;
+	@SuppressWarnings("rawtypes")
 	private JComboBox languagesBox = null;
 	// main form components
 	private JFrame mainForm = null;
@@ -251,7 +252,6 @@ public class ClientGUI {
 	private void createWelcomeLabel() {
 		welcomeLabel = new JLabel(
 				LanguageManager.getString("loginFormNicknameText"));
-		welcomeLabel.setPreferredSize(new Dimension(350, 64));
 	}
 
 	/**
@@ -371,5 +371,25 @@ public class ClientGUI {
 		}
 		JOptionPane.showMessageDialog(currentFrame, text, caption,
 				JOptionPane.ERROR_MESSAGE);
+	}
+
+	/**
+	 * Shows an info message on the current form with the given text and
+	 * caption.
+	 * 
+	 * @param text
+	 *            is the message of the error
+	 * @param caption
+	 *            is the title of the error message box.
+	 */
+	public void showInfoMessage(String text, String caption) {
+		JFrame currentFrame = null;
+		if (currentForm == 1) {
+			currentFrame = loginForm;
+		} else {
+			currentFrame = mainForm;
+		}
+		JOptionPane.showMessageDialog(currentFrame, text, caption,
+				JOptionPane.INFORMATION_MESSAGE);
 	}
 }

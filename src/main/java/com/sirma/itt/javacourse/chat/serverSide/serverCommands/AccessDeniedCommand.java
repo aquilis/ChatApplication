@@ -2,6 +2,7 @@ package com.sirma.itt.javacourse.chat.serverSide.serverCommands;
 
 import java.util.Observable;
 
+import com.sirma.itt.javacourse.chat.LanguageManager;
 import com.sirma.itt.javacourse.chat.clientSide.ServerListener;
 
 /**
@@ -18,8 +19,8 @@ public class AccessDeniedCommand extends Observable implements ServerCommand {
 	@Override
 	public void execute(ServerListener listener) {
 		listener.getClientController().showError(
-						"Please, make sure that your nickname is unique and doesn't have invalid characters",
-						"Invalid nickname");
+				LanguageManager.getString("invalidNicknameError"),
+				LanguageManager.getString("invalidNicknameErrorCaption"));
 		listener.getSender().deactivate();
 	}
 }
