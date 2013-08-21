@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.logging.FileHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.sirma.itt.javacourse.chat.LanguageManager;
@@ -19,7 +20,7 @@ public class ServerListener extends Thread {
 	private ServerSender sender = null;
 	private ClientController controller = null;
 	private Socket socket = null;
-	// the logger instance and handlers
+	// logger
 	private static final Logger LOGGER = Logger.getLogger(ServerListener.class
 			.getName());
 	private final FileHandler fileHandler = LogHandlersManager
@@ -43,6 +44,9 @@ public class ServerListener extends Thread {
 		this.sender = sender;
 		this.controller = controller;
 		LOGGER.setUseParentHandlers(false);
+		if (LOGGER.getHandlers().length > 0) {
+			LOGGER.removeHandler(LOGGER.getHandlers()[0]);
+		}
 		LOGGER.addHandler(fileHandler);
 		try {
 			in = new ObjectInputStream(socket.getInputStream());
@@ -92,17 +96,19 @@ public class ServerListener extends Thread {
 				incomingCommand.execute(this);
 			}
 		} catch (IOException e) {
-			// block entered when the connection to server unexpectedly drops.
+			// block entered when the connection to server unexpectedly drops -
+			// when the server application is suddenly closed or when the
+			// connection is interrupted.
 			LOGGER.info("Connection to server lost");
 			controller.log(LanguageManager.getString("connectionToServerLost"));
 			controller.deactivate();
+		} catch (ClassNotFoundException e) {
+			LOGGER.log(Level.WARNING, e.getMessage(), e);
+		} finally {
+			// log when this thread terminates
+			LOGGER.info("server listener thread terminated.");
 			// the sender thread is not needed anymore
 			sender.deactivate();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (NullPointerException e) {
-		} finally {
-			LOGGER.info("server listener thread terminated.");
 			// clean up
 			try {
 				in.close();

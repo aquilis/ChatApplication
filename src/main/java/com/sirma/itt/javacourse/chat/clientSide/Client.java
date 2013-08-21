@@ -35,6 +35,9 @@ public final class Client {
 	 */
 	Client() throws IOException {
 		LOGGER.setUseParentHandlers(false);
+		if (LOGGER.getHandlers().length > 0) {
+			LOGGER.removeHandler(LOGGER.getHandlers()[0]);
+		}
 		LOGGER.addHandler(fileHandler);
 	}
 
@@ -111,9 +114,11 @@ public final class Client {
 	 */
 	public void join(int port, String address, ClientController controller)
 			throws IOException {
-		clientSocket = new Socket(address, port);
-		LOGGER.info("client socket opened at port " + port + " | address: "
+		LOGGER.info("Client requested join at port " + port + " | address: "
 				+ address);
+		clientSocket = new Socket(address, port);
+		LOGGER.info("client socket succesfully bound to port " + port
+				+ " | address: " + address);
 		sender = new ServerSender(clientSocket);
 		new ServerListener(clientSocket, sender, controller);
 		sender.sendCommand(new JoinRequestCommand(nickname));

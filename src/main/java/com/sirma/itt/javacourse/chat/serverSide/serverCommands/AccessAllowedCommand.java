@@ -1,5 +1,7 @@
 package com.sirma.itt.javacourse.chat.serverSide.serverCommands;
 
+import java.util.logging.Level;
+
 import com.sirma.itt.javacourse.chat.clientSide.ServerListener;
 
 /**
@@ -14,5 +16,7 @@ public class AccessAllowedCommand implements ServerCommand {
 	@Override
 	public void execute(ServerListener listener) {
 		listener.getClientController().moveToMainForm();
+		listener.getClientController().logToFile(
+				"Nickname approved by server. Join successfull", Level.INFO);
 	}
 }

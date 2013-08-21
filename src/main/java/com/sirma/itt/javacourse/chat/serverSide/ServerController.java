@@ -53,6 +53,9 @@ public class ServerController {
 		this.gui = gui;
 		this.server = server;
 		LOGGER.setUseParentHandlers(false);
+		if (LOGGER.getHandlers().length > 0) {
+			LOGGER.removeHandler(LOGGER.getHandlers()[0]);
+		}
 		LOGGER.addHandler(fileHandler);
 		attachButtonsActionListeners();
 		loadProperties();

@@ -5,7 +5,10 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
 
+import com.sirma.itt.javacourse.chat.LogHandlersManager;
 import com.sirma.itt.javacourse.chat.clientSide.clientCommands.ClientCommand;
 
 /**
@@ -15,6 +18,10 @@ public class ServerSender extends Thread {
 	private final Queue<ClientCommand> queueCommands = new LinkedList<ClientCommand>();
 	private ObjectOutputStream out = null;
 	private Socket socket = null;
+	private static final Logger LOGGER = Logger.getLogger(ServerListener.class
+			.getName());
+	private final FileHandler fileHandler = LogHandlersManager
+			.getClientHandler();
 
 	/**
 	 * Deactivates and terminates the sender thread. Used when the client
@@ -32,6 +39,11 @@ public class ServerSender extends Thread {
 	 */
 	public ServerSender(Socket socket) {
 		this.socket = socket;
+		LOGGER.setUseParentHandlers(false);
+		if (LOGGER.getHandlers().length > 0) {
+			LOGGER.removeHandler(LOGGER.getHandlers()[0]);
+		}
+		LOGGER.addHandler(fileHandler);
 		try {
 			out = new ObjectOutputStream(socket.getOutputStream());
 		} catch (IOException e) {
@@ -81,6 +93,8 @@ public class ServerSender extends Thread {
 				break;
 			}
 		}
+		// log when the sender thread terminates
+		LOGGER.info("Server sender thread terminated");
 		// when the sender terminates, sends a null object to stop the
 		// corresponding listener on the server side (if the socket is still
 		// open)

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.logging.FileHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JComboBox;
@@ -58,6 +59,9 @@ public class ClientController {
 		this.gui = gui;
 		this.client = client;
 		LOGGER.setUseParentHandlers(false);
+		if (LOGGER.getHandlers().length > 0) {
+			LOGGER.removeHandler(LOGGER.getHandlers()[0]);
+		}
 		LOGGER.addHandler(fileHandler);
 		attachButtonsActionListeners();
 		loadProperties();
@@ -202,6 +206,20 @@ public class ClientController {
 	 */
 	public void log(String msg) {
 		gui.log(msg);
+	}
+
+	/**
+	 * Logs the given message to the file using logger object. Used by the serve
+	 * commands that can not contain private logger instance (not-
+	 * serializable).
+	 * 
+	 * @param msg
+	 *            is the message to log to the file
+	 * @param level
+	 *            is the log level
+	 */
+	public void logToFile(String msg, Level level) {
+		LOGGER.log(level, msg);
 	}
 
 	/**

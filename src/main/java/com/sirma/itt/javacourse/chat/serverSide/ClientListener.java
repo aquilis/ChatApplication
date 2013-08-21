@@ -22,7 +22,7 @@ public class ClientListener extends Thread {
 	private ObjectInputStream in = null;
 	private ClientWrapper client = null;
 	private ServerController controller = null;
-	// the logger instance and handlers
+	// logger
 	private static final Logger LOGGER = Logger.getLogger(ClientListener.class
 			.getName());
 	private final FileHandler fileHandler = LogHandlersManager
@@ -77,6 +77,9 @@ public class ClientListener extends Thread {
 		Socket socket = client.getSocket();
 		// logger
 		LOGGER.setUseParentHandlers(false);
+		if (LOGGER.getHandlers().length > 0) {
+			LOGGER.removeHandler(LOGGER.getHandlers()[0]);
+		}
 		LOGGER.addHandler(fileHandler);
 		try {
 			in = new ObjectInputStream(socket.getInputStream());
@@ -117,7 +120,6 @@ public class ClientListener extends Thread {
 						.getNickname()));
 			}
 		} catch (ClassNotFoundException e) {
-			// e.printStackTrace();
 			LOGGER.log(Level.WARNING, e.getMessage(), e);
 		} finally {
 			LOGGER.info("Client listener thread for " + client.getNickname()

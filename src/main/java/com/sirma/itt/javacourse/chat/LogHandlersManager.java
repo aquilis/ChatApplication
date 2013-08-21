@@ -50,7 +50,6 @@ public final class LogHandlersManager {
 			} catch (SecurityException | IOException e) {
 				e.printStackTrace();
 			}
-			clientHandler.setFormatter(new LogFormatter());
 		}
 		return clientHandler;
 	}

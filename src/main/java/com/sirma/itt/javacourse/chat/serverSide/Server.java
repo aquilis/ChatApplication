@@ -20,25 +20,27 @@ public final class Server {
 	private ServerSocket serverSocket = null;
 	private Transmitter transmitter = null;
 	public static final char[] FORBIDDEN_CHARACTERS = { '[', ']' };
-
-	// the logger instance and handlers
+	// logger
 	private static final Logger LOGGER = Logger.getLogger(Server.class
 			.getName());
 	private final FileHandler fileHandler = LogHandlersManager
 			.getServerHandler();
 
 	/**
-	 * Constructs the server instantiating its socket and the transmitter.
+	 * Constructs the server.
 	 */
 	Server() {
 		// logger
 		LOGGER.setUseParentHandlers(false);
+		if (LOGGER.getHandlers().length > 0) {
+			LOGGER.removeHandler(LOGGER.getHandlers()[0]);
+		}
 		LOGGER.addHandler(fileHandler);
 	}
 
 	/**
-	 * Opens the server socket listening at the given port and address and
-	 * starts the transmitter object.
+	 * Opens the server socket at the given port and address and starts the
+	 * transmitter that will dispatch the commands to all.
 	 * 
 	 * @param port
 	 *            is the port to start the socket at
@@ -50,7 +52,8 @@ public final class Server {
 	public void startServer(int port, String address) throws IOException {
 		serverSocket = new ServerSocket(port, 50,
 				InetAddress.getByName(address));
-		LOGGER.info("Server socket opened at port " + port);
+		LOGGER.info("Server socket opened at port " + port + " | Address: "
+				+ address);
 		transmitter = new Transmitter();
 		transmitter.start();
 	}
