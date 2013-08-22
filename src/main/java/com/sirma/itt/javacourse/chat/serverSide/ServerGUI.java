@@ -24,6 +24,7 @@ import com.sirma.itt.javacourse.chat.LanguageManager;
 public class ServerGUI {
 
 	private int currentForm = 1;
+	private boolean isActive = true;
 	// login form components
 	private JFrame loginForm = null;
 	private JButton startButton = null;
@@ -228,6 +229,9 @@ public class ServerGUI {
 	 *            is the message to log
 	 */
 	public void log(String msg) {
+		if (!isActive) {
+			return;
+		}
 		logBox.append("\n["
 				+ new SimpleDateFormat("HH:mm:ss").format(new Date()) + "] "
 				+ msg);
@@ -237,6 +241,7 @@ public class ServerGUI {
 	 * Deactivates all active GUI components.
 	 */
 	public void deactivate() {
+		isActive = false;
 		stopButton.setEnabled(false);
 		logBox.setEnabled(false);
 	}

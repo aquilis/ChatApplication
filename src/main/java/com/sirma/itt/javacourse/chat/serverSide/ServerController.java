@@ -120,7 +120,7 @@ public class ServerController {
 	 * Attaches action listeners to the GUI buttons.
 	 */
 	private void attachButtonsActionListeners() {
-		// when the stop server button is hit
+		// executed when the stop server button is hit
 		ActionListener stopButtonListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

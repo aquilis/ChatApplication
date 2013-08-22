@@ -3,9 +3,9 @@ package com.sirma.itt.javacourse.chat.serverSide;
 import java.net.Socket;
 
 /**
- * Encapsulates each client socket connected to the server with the main client attributes - its
- * sender and listener threads and its nickname in one single, wrapper class that the server will
- * handle.
+ * Encapsulates each client socket connected to the server with the main client
+ * attributes - its sender and listener threads (on the server side) and its
+ * nickname in one single, wrapper class that the server will handle.
  */
 public class ClientWrapper {
 

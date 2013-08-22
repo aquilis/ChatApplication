@@ -76,14 +76,14 @@ public class JoinRequestCommand implements ClientCommand {
 		this.client = listener.getClient();
 		// if the requested nickname gets approved
 		if (isNicknameValid(nickname) && (isNicknameUnique(nickname))) {
-			// update server's GUI
+			// update server's GUI with the newly joined client
 			listener.getController().log(
 					nickname + " " + LanguageManager.getString("joined"));
 			// send the client access allowed command
 			client.getSender().sendCommand(new AccessAllowedCommand());
 			client.setNickname(nickname);
-			// send all other clients the commands to add the new one to their
-			// lists
+			// send to all other clients the commands to add the new one to
+			// their lists
 			transmitter.sendCommand(new AddOnlineClientCommand(client
 					.getNickname()));
 			transmitter.addClient(client);
