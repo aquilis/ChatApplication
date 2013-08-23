@@ -15,8 +15,6 @@ import com.sirma.itt.javacourse.chat.clientSide.clientCommands.JoinRequestComman
  * Contains the basic business (back-end) logic for the client-side application.
  */
 public final class Client {
-	// private final int port = 7000;
-	// private final InetAddress address = InetAddress.getByName("localhost");
 	private String nickname = null;
 	private Socket clientSocket = null;
 	private ServerSender sender = null;

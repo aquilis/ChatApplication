@@ -47,7 +47,7 @@ public final class LogHandlersManager {
 			try {
 				clientHandler = new FileHandler(CLIENT_LOG_FILENAME, true);
 				clientHandler.setFormatter(new LogFormatter());
-			} catch (SecurityException | IOException e) {
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}

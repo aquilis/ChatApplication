@@ -101,9 +101,9 @@ public class ServerSender extends Thread {
 		try {
 			if ((out != null) && (socket != null)) {
 				out.writeObject(null);
-				// clean up
-				out.close();
 			}
+			// clean up
+			out.close();
 		} catch (IOException e) {
 		}
 	}
