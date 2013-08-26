@@ -51,8 +51,8 @@ public class ServerListener extends Thread {
 		try {
 			in = new ObjectInputStream(socket.getInputStream());
 		} catch (IOException e) {
-			LOGGER.warning("Error opening Object input stream");
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error opening I/O stream. Thread start cancelled", e);
+			return;
 		}
 		start();
 	}
@@ -113,7 +113,7 @@ public class ServerListener extends Thread {
 			try {
 				in.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				LOGGER.log(Level.WARNING, "Error closing I/O stream", e);
 			}
 		}
 	}

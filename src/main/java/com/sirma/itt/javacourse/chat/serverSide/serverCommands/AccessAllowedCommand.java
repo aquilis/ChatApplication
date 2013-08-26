@@ -16,6 +16,8 @@ public class AccessAllowedCommand implements ServerCommand {
 	@Override
 	public void execute(ServerListener listener) {
 		listener.getClientController().moveToMainForm();
+		listener.getClientController().activate();
+		listener.getClientController().setIsClientAccepted(true);
 		listener.getClientController().logToFile(
 				"Nickname approved by server. Join successfull", Level.INFO);
 	}

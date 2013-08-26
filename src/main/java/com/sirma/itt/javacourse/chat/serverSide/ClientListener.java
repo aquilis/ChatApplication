@@ -84,8 +84,7 @@ public class ClientListener extends Thread {
 		try {
 			in = new ObjectInputStream(socket.getInputStream());
 		} catch (IOException e) {
-			// e.printStackTrace();
-			LOGGER.log(Level.WARNING, e.getMessage(), e);
+			LOGGER.log(Level.WARNING, "Error opening I/O stream.", e);
 		}
 	}
 
@@ -101,8 +100,7 @@ public class ClientListener extends Thread {
 				incomingCommand.execute(this);
 			}
 		} catch (IOException e) {
-			// block entered when the client unexpectedly disconnects without
-			// sending the appropriate command.
+			// block entered when connection is stopped from client
 			client.getSender().deactivate();
 			if (!"".equals(client.getNickname())) {
 				LOGGER.info("Listener lost connection with "
@@ -126,6 +124,9 @@ public class ClientListener extends Thread {
 					+ " terminated.");
 			// clean up
 			try {
+				if (client.getSocket() != null) {
+					client.getSocket().close();
+				}
 				in.close();
 			} catch (IOException e) {
 				LOGGER.warning("Error closing the input stream for client "

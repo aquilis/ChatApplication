@@ -1,14 +1,14 @@
 package com.sirma.itt.javacourse.chat.serverSide.serverCommands;
 
+import java.io.IOException;
 import java.util.logging.Level;
 
 import com.sirma.itt.javacourse.chat.LanguageManager;
 import com.sirma.itt.javacourse.chat.clientSide.ServerListener;
 
 /**
- * This command is sent from the server when the client nickname is invalid.
- * Shows an error on the client GUI and stops the client sender and listener
- * threads.
+ * This command is sent from the server when the client nickname is invalid. Shows an error on the
+ * client GUI and closes the socket stopping the client sender and listener threads.
  */
 public class AccessDeniedCommand implements ServerCommand {
 	/**
@@ -25,5 +25,9 @@ public class AccessDeniedCommand implements ServerCommand {
 				"Nickname not approved by server. Join failed",
 				Level.INFO);
 		listener.getSender().deactivate();
+		try {
+			listener.getSocket().close();
+		} catch (IOException e) {
+		}
 	}
 }

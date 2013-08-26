@@ -24,6 +24,7 @@ import com.sirma.itt.javacourse.chat.LanguageManager;
 public class ClientGUI {
 
 	private int currentForm = 1;
+	private boolean isActive = true;
 	// login form components
 	private JFrame loginForm = null;
 	private JTextField nicknameTextBox = null;
@@ -101,6 +102,15 @@ public class ClientGUI {
 		mainForm.getContentPane().add(textBox);
 		mainForm.getContentPane().add(sendButton);
 		mainForm.getContentPane().add(disconnectButton);
+	}
+
+	/**
+	 * Gets the current state of the GUI.
+	 * 
+	 * @return true if the GUI buttons and text areas are still active.
+	 */
+	public boolean isActive() {
+		return isActive;
 	}
 
 	/**
@@ -331,9 +341,20 @@ public class ClientGUI {
 	}
 
 	/**
+	 * Activates the GUI buttons and text areas/boxes.
+	 */
+	public void activate() {
+		isActive = true;
+		sendButton.setEnabled(true);
+		disconnectButton.setEnabled(true);
+		textBox.setEnabled(true);
+	}
+
+	/**
 	 * Deactivates all active GUI elements - the text box and the buttons.
 	 */
 	public void deactivate() {
+		isActive = false;
 		sendButton.setEnabled(false);
 		disconnectButton.setEnabled(false);
 		textBox.setEnabled(false);

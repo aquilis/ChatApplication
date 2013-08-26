@@ -33,6 +33,7 @@ public class ClientController {
 	private ArrayList<String> onlineClients = new ArrayList<String>();
 	// reference used inside the action listeners
 	private final ClientController thisController = this;
+	private boolean isClientAccepted = false;
 	// logger
 	private static final Logger LOGGER = Logger
 			.getLogger(ClientController.class.getName());
@@ -105,6 +106,27 @@ public class ClientController {
 		} catch (IOException e2) {
 			e2.printStackTrace();
 		}
+	}
+
+	/**
+	 * Checks if the client of this controller is approved by the server and
+	 * connected to the chat room.
+	 * 
+	 * @return true if the client is joined
+	 */
+	public boolean isClientAccepted() {
+		return isClientAccepted;
+	}
+
+	/**
+	 * Set to true when the client joins the chat room.
+	 * 
+	 * @param isClientAccepted
+	 *            indicates that the client has successfully joined the chat
+	 *            room
+	 */
+	public void setIsClientAccepted(boolean isClientAccepted) {
+		this.isClientAccepted = isClientAccepted;
 	}
 
 	/**
@@ -220,6 +242,13 @@ public class ClientController {
 	 */
 	public void logToFile(String msg, Level level) {
 		LOGGER.log(level, msg);
+	}
+
+	/**
+	 * Activates the GUI.
+	 */
+	public void activate() {
+		gui.activate();
 	}
 
 	/**

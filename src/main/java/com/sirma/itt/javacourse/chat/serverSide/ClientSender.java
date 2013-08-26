@@ -5,7 +5,11 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import com.sirma.itt.javacourse.chat.LogHandlersManager;
 import com.sirma.itt.javacourse.chat.serverSide.serverCommands.ServerCommand;
 
 /**
@@ -15,10 +19,13 @@ public class ClientSender extends Thread {
 	private final Queue<ServerCommand> queueCommands = new LinkedList<ServerCommand>();
 	private Socket socket = null;
 	private ObjectOutputStream out = null;
+	// logger
+	private static final Logger LOGGER = Logger.getLogger(ClientSender.class.getName());
+	private final FileHandler fileHandler = LogHandlersManager.getServerHandler();
 
 	/**
-	 * Deactivates and terminates the sender thread. Used when the client
-	 * disconnects or when the connection is lost.
+	 * Deactivates and terminates the sender thread. Used when the client disconnects or when the
+	 * connection is lost.
 	 */
 	public synchronized void deactivate() {
 		interrupt();
@@ -32,10 +39,15 @@ public class ClientSender extends Thread {
 	 */
 	public ClientSender(ClientWrapper client) {
 		this.socket = client.getSocket();
+		LOGGER.setUseParentHandlers(false);
+		if (LOGGER.getHandlers().length > 0) {
+			LOGGER.removeHandler(LOGGER.getHandlers()[0]);
+		}
+		LOGGER.addHandler(fileHandler);
 		try {
 			out = new ObjectOutputStream(socket.getOutputStream());
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error opening I/O stream.", e);
 		}
 	}
 
@@ -51,8 +63,8 @@ public class ClientSender extends Thread {
 	}
 
 	/**
-	 * If there are enqueued messages in the queue, retrieve and remove the
-	 * first one, otherwise, pause the thread until the queue fills.
+	 * If there are enqueued messages in the queue, retrieve and remove the first one, otherwise,
+	 * pause the thread until the queue fills.
 	 * 
 	 * @return the oldest message in the queue, if any
 	 */
@@ -79,16 +91,6 @@ public class ClientSender extends Thread {
 			} catch (IOException e) {
 				break;
 			}
-		}
-		// if the server listener on the client side is still not terminated,
-		// send it a null object to stop it
-		try {
-			if ((out != null) && (socket != null)) {
-				out.writeObject(null);
-			}
-			// clean up
-			out.close();
-		} catch (IOException e) {
 		}
 	}
 }

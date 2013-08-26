@@ -31,7 +31,7 @@ public final class Client {
 	 * @throws IOException
 	 *             if problem with the IO
 	 */
-	Client() throws IOException {
+	public Client() throws IOException {
 		LOGGER.setUseParentHandlers(false);
 		if (LOGGER.getHandlers().length > 0) {
 			LOGGER.removeHandler(LOGGER.getHandlers()[0]);

@@ -67,7 +67,6 @@ public class Transmitter extends Thread {
 			try {
 				wait();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
 			}
 		}
 		return queueCommands.poll();
@@ -79,7 +78,7 @@ public class Transmitter extends Thread {
 	 * @param cmd
 	 *            is the command to send to all clients
 	 */
-	private void sendToAll(ServerCommand cmd) {
+	private synchronized void sendToAll(ServerCommand cmd) {
 		for (ClientWrapper client : listClients) {
 			client.getSender().sendCommand(cmd);
 		}
