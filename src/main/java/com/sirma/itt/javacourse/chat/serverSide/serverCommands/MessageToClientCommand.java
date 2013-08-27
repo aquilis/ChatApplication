@@ -3,7 +3,8 @@ package com.sirma.itt.javacourse.chat.serverSide.serverCommands;
 import com.sirma.itt.javacourse.chat.clientSide.ServerListener;
 
 /**
- * Encapsulates a message that has to be sent to a client and displayed on its GUI.
+ * Encapsulates a message that has to be sent to a client and displayed on its
+ * GUI.
  */
 public class MessageToClientCommand implements ServerCommand {
 	/**
@@ -25,6 +26,6 @@ public class MessageToClientCommand implements ServerCommand {
 
 	@Override
 	public void execute(ServerListener listener) {
-		listener.getClientController().log(message);
+			listener.getClientController().log(message);
 	}
 }

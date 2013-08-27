@@ -94,9 +94,10 @@ public class ClientListener extends Thread {
 		try {
 			while ((input = in.readObject()) != null) {
 				ClientCommand incomingCommand = (ClientCommand) input;
-				LOGGER.info("New commmand from client " + client.getNickname()
-						+ " received. Command type: "
-						+ incomingCommand.getClass().getCanonicalName());
+				// LOGGER.info("New commmand from client " +
+				// client.getNickname()
+				// + " received. Command type: "
+				// + incomingCommand.getClass().getCanonicalName());
 				incomingCommand.execute(this);
 			}
 		} catch (IOException e) {

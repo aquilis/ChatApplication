@@ -33,7 +33,6 @@ public class ClientController {
 	private ArrayList<String> onlineClients = new ArrayList<String>();
 	// reference used inside the action listeners
 	private final ClientController thisController = this;
-	private boolean isClientAccepted = false;
 	// logger
 	private static final Logger LOGGER = Logger
 			.getLogger(ClientController.class.getName());
@@ -79,7 +78,8 @@ public class ClientController {
 			prop.load(new FileInputStream(PROPERTIES_FILE));
 			langProp.load(new FileInputStream(LANGUAGE_FILE));
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error loading properties files", e);
+			return;
 		}
 		gui.getPortTextBox().setText(prop.getProperty("port"));
 		gui.getAddressTextBox().setText(prop.getProperty("address"));
@@ -89,7 +89,7 @@ public class ClientController {
 	}
 
 	/**
-	 * Gets the chosen properties from the client GUI and save them to the
+	 * Gets the chosen properties from the client GUI and saves them to the
 	 * properties files.
 	 */
 	private void saveProperties() {
@@ -104,29 +104,9 @@ public class ClientController {
 			prop.store(new FileOutputStream(PROPERTIES_FILE), null);
 			langProp.store(new FileOutputStream(LANGUAGE_FILE), null);
 		} catch (IOException e2) {
-			e2.printStackTrace();
+			LOGGER.log(Level.WARNING,
+					"Error saving user settings to the properties files", e2);
 		}
-	}
-
-	/**
-	 * Checks if the client of this controller is approved by the server and
-	 * connected to the chat room.
-	 * 
-	 * @return true if the client is joined
-	 */
-	public boolean isClientAccepted() {
-		return isClientAccepted;
-	}
-
-	/**
-	 * Set to true when the client joins the chat room.
-	 * 
-	 * @param isClientAccepted
-	 *            indicates that the client has successfully joined the chat
-	 *            room
-	 */
-	public void setIsClientAccepted(boolean isClientAccepted) {
-		this.isClientAccepted = isClientAccepted;
 	}
 
 	/**
@@ -144,6 +124,7 @@ public class ClientController {
 				} catch (NumberFormatException e1) {
 					gui.showError(LanguageManager.getString("portFormatError"),
 							LanguageManager.getString("portFormatErrorCaption"));
+					return;
 				}
 				address = gui.getAddressTextBox().getText();
 				saveProperties();
@@ -178,7 +159,8 @@ public class ClientController {
 			public void actionPerformed(ActionEvent e) {
 				if (client.isMessageLengthValid(gui.getTextBox().getText())) {
 					client.sendCommand(new MessageToServerCommand(client
-							.formatMessage(gui.getTextBox().getText().trim())));
+							.formatMessage(gui.getTextBox().getText().trim()),
+							false));
 					gui.getTextBox().setText("");
 				} else {
 					showError(LanguageManager.getString("messageLengthError"),

@@ -51,7 +51,8 @@ public class ServerListener extends Thread {
 		try {
 			in = new ObjectInputStream(socket.getInputStream());
 		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, "Error opening I/O stream. Thread start cancelled", e);
+			LOGGER.log(Level.WARNING,
+					"Error opening I/O stream. Thread start cancelled", e);
 			return;
 		}
 		start();
@@ -91,17 +92,17 @@ public class ServerListener extends Thread {
 		try {
 			while ((input = in.readObject()) != null) {
 				ServerCommand incomingCommand = (ServerCommand) input;
-				LOGGER.info("Command received from server. Command type: "
-						+ incomingCommand.getClass().getCanonicalName());
+				// LOGGER.info("Command received from server. Command type: "
+				// + incomingCommand.getClass().getCanonicalName());
 				incomingCommand.execute(this);
 			}
 		} catch (IOException e) {
-			// block entered when the connection to server unexpectedly drops -
-			// when the server application is suddenly closed or when the
-			// connection is interrupted.
 			LOGGER.info("Connection to server lost");
-			controller.log(LanguageManager.getString("connectionToServerLost"));
-			controller.deactivate();
+			if (controller != null) {
+				controller.log(LanguageManager
+						.getString("connectionToServerLost"));
+				controller.deactivate();
+			}
 		} catch (ClassNotFoundException e) {
 			LOGGER.log(Level.WARNING, e.getMessage(), e);
 		} finally {

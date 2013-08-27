@@ -35,23 +35,6 @@ public class JoinRequestCommand implements ClientCommand {
 	}
 
 	/**
-	 * Checks if the given user nickname is valid, according to the array of
-	 * forbidden characters defined by the server.
-	 * 
-	 * @param nickname
-	 *            is the nickname to check
-	 * @return true if the nickname is valid
-	 */
-	private boolean isNicknameValid(String nickname) {
-		for (char ch : Server.FORBIDDEN_CHARACTERS) {
-			if (nickname.contains(String.valueOf(ch))) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
 	 * Checks if the nickname of the clients is unique, taking the nicknames of
 	 * all other connected clients. Not case-sensitive.
 	 * 
@@ -75,7 +58,7 @@ public class JoinRequestCommand implements ClientCommand {
 		this.transmitter = listener.getTransmitter();
 		this.client = listener.getClient();
 		// if the requested nickname gets approved
-		if (isNicknameValid(nickname) && (isNicknameUnique(nickname))) {
+		if (Server.isNicknameValid(nickname) && (isNicknameUnique(nickname))) {
 			// update server's GUI with the newly joined client
 			listener.getController().log(
 					nickname + " " + LanguageManager.getString("joined"));

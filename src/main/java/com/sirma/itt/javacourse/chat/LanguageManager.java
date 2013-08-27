@@ -34,10 +34,11 @@ public final class LanguageManager {
 			Properties prop = new Properties();
 			try {
 				prop.load(new FileInputStream(FILENAME));
+				language = prop.getProperty("language");
 			} catch (IOException e) {
-				e.printStackTrace();
+				// if the properties file can't be found, set EN as default
+				language = "en";
 			}
-			language = prop.getProperty("language");
 			locale = new Locale(language);
 			words = ResourceBundle.getBundle("UI", locale, new UTF8Control());
 		}

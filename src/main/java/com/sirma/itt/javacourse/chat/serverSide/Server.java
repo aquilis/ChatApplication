@@ -13,18 +13,16 @@ import com.sirma.itt.javacourse.chat.LogHandlersManager;
 import com.sirma.itt.javacourse.chat.serverSide.serverCommands.CloseConnectionCommand;
 
 /**
- * The server-side application. Contains the basic business logic for the
- * server. The rest is handled by the handler threads and the client commands.
+ * The server-side application. Contains the basic business logic for the server. The rest is
+ * handled by the handler threads and the client commands.
  */
 public final class Server {
 	private ServerSocket serverSocket = null;
 	private Transmitter transmitter = null;
 	public static final char[] FORBIDDEN_CHARACTERS = { '[', ']' };
 	// logger
-	private static final Logger LOGGER = Logger.getLogger(Server.class
-			.getName());
-	private final FileHandler fileHandler = LogHandlersManager
-			.getServerHandler();
+	private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
+	private final FileHandler fileHandler = LogHandlersManager.getServerHandler();
 
 	/**
 	 * Constructs the server.
@@ -39,8 +37,25 @@ public final class Server {
 	}
 
 	/**
-	 * Opens the server socket at the given port and address and starts the
-	 * transmitter that will dispatch the commands to all.
+	 * Checks if the given user nickname is valid, according to the array of forbidden characters
+	 * defined by the server.
+	 * 
+	 * @param nickname
+	 *            is the nickname to check
+	 * @return true if the nickname is valid
+	 */
+	public static boolean isNicknameValid(String nickname) {
+		for (char ch : FORBIDDEN_CHARACTERS) {
+			if (nickname.contains(String.valueOf(ch))) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Opens the server socket at the given port and address and starts the transmitter that will
+	 * dispatch the commands to all.
 	 * 
 	 * @param port
 	 *            is the port to start the socket at
@@ -50,10 +65,8 @@ public final class Server {
 	 *             if the server socket can't be opened
 	 */
 	public void startServer(int port, String address) throws IOException {
-		serverSocket = new ServerSocket(port, 50,
-				InetAddress.getByName(address));
-		LOGGER.info("Server socket opened at port " + port + " | Address: "
-				+ address);
+		serverSocket = new ServerSocket(port, 50, InetAddress.getByName(address));
+		LOGGER.info("Server socket opened at port " + port + " | Address: " + address);
 		transmitter = new Transmitter();
 		transmitter.start();
 	}
@@ -67,6 +80,7 @@ public final class Server {
 			serverSocket.close();
 		} catch (IOException e1) {
 			LOGGER.log(Level.WARNING, e1.getMessage(), e1);
+			return;
 		}
 		LOGGER.info("Server socket closed");
 	}
@@ -81,8 +95,8 @@ public final class Server {
 	}
 
 	/**
-	 * Waits for a new client to connect, and when that happens, encapsulates it
-	 * inside the wrapper class and return a reference to it.
+	 * Waits for a new client to connect, and when that happens, encapsulates it inside the wrapper
+	 * class and return a reference to it.
 	 * 
 	 * @return the lastly connected client
 	 * @throws IOException
@@ -114,16 +128,14 @@ public final class Server {
 	 * @param client
 	 *            is the client to attach a listener thread to
 	 * @param transmitter
-	 *            the listener thread needs the transmitter to send the received
-	 *            commands to all
+	 *            the listener thread needs the transmitter to send the received commands to all
 	 * @param controller
-	 *            the listener thread also needs the controller so that the
-	 *            incoming commands can execute using its functionality
+	 *            the listener thread also needs the controller so that the incoming commands can
+	 *            execute using its functionality
 	 */
-	public void attachClientListener(ClientWrapper client,
-			Transmitter transmitter, ServerController controller) {
-		ClientListener listener = new ClientListener(transmitter, client,
-				controller);
+	public void attachClientListener(ClientWrapper client, Transmitter transmitter,
+			ServerController controller) {
+		ClientListener listener = new ClientListener(transmitter, client, controller);
 		client.setListener(listener);
 		listener.start();
 		controller.log(LanguageManager.getString("listenerStarted"));

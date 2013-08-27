@@ -31,7 +31,7 @@ public final class LogHandlersManager {
 				serverHandler = new FileHandler(SERVER_LOG_FILENAME, true);
 				serverHandler.setFormatter(new LogFormatter());
 			} catch (SecurityException | IOException e) {
-				e.printStackTrace();
+				return null;
 			}
 		}
 		return serverHandler;
@@ -48,7 +48,7 @@ public final class LogHandlersManager {
 				clientHandler = new FileHandler(CLIENT_LOG_FILENAME, true);
 				clientHandler.setFormatter(new LogFormatter());
 			} catch (IOException e) {
-				e.printStackTrace();
+				return null;
 			}
 		}
 		return clientHandler;

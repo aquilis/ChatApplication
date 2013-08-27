@@ -72,7 +72,8 @@ public class ServerController {
 			prop.load(new FileInputStream(PROPERTIES_FILE));
 			langProp.load(new FileInputStream(LANGUAGE_FILE));
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error loading properties files", e);
+			return;
 		}
 		gui.getPortTextBox().setText(prop.getProperty("port"));
 		gui.getAddressTextBox().setText(prop.getProperty("address"));
@@ -95,7 +96,7 @@ public class ServerController {
 			prop.store(new FileOutputStream(PROPERTIES_FILE), null);
 			langProp.store(new FileOutputStream(LANGUAGE_FILE), null);
 		} catch (IOException e2) {
-			e2.printStackTrace();
+			LOGGER.log(Level.WARNING, "Error saving user settings to the properties files", e2);
 		}
 	}
 

@@ -21,7 +21,6 @@ public class CloseConnectionCommand implements ServerCommand {
 		try {
 			listener.getSocket().close();
 		} catch (IOException e) {
-			e.printStackTrace();
 		}
 		listener.getClientController().deactivate();
 	}
